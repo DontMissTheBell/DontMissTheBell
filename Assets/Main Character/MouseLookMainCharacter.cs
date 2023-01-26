@@ -15,7 +15,6 @@ public class MouseLookMainCharacter : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked; // hides the cursor
     }
 
-
     void Update()
     {
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime; // creates a variable saying to move the camera along x axis if mouse is moving along x axis at the mouseSensitivity rate multiplied by time delta
@@ -28,6 +27,7 @@ public class MouseLookMainCharacter : MonoBehaviour
 
         playerBody.Rotate(Vector3.up * mouseX); // rotates whatever transform we put into the Transform variable at the start for us it will be the player, then it will rotate the player alongside the camera
     }
+
 }
     
 

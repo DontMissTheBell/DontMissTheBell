@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerMovement : MonoBehaviour // used MC_ for main character variables to cause less confusion later on
 {
@@ -10,6 +11,10 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     public float MC_gravity = -12f;
     public float MC_JumpHeight = 150000f;
     public Vector3 playerVelocity;
+
+    [SerializeField]
+    private GameObject powerupParticle;
+    private ParticleSystem powerupParticleSystem;
     
 
 
@@ -22,10 +27,10 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     Vector3 velocity;
 
-    //void Start()
-    //{
-    //    MC_rbody = GetComponent<Rigidbody>();
-    //}
+    void Start()
+    {
+        powerupParticleSystem = powerupParticle.GetComponent<ParticleSystem>();
+    }
 
     // Update is called once per frame
     void Update()
@@ -63,7 +68,39 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                                                     // sorry thats just maths, thats just the eqation we have to do to find our velocity
     }
 
-   
+
+    IEnumerator Powerup_Effect()
+    {
+        powerupParticleSystem.Play();
+        yield return new WaitForSeconds(4.5f);
+        powerupParticleSystem.Stop();
+    }
+    IEnumerator Powerup_SpeedBoost()
+    {
+        MC_PlayerSpeed *= 2;
+        yield return new WaitForSeconds(5);
+        MC_PlayerSpeed /= 2;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Powerup")
+        {
+            var otherScript = other.GetComponent<Powerup>();
+            otherScript.particles.Play();
+            if (otherScript.variant == 1)
+                {
+                    StartCoroutine(Powerup_SpeedBoost());
+                }
+            otherScript.powerupLoop1.Kill();
+            otherScript.powerupLoop2.Kill();
+            otherScript.particles.transform.parent = null;
+            Destroy(other.gameObject);
+            Destroy(otherScript.particles.gameObject, 1f);
+            StartCoroutine(Powerup_Effect());
+        }
+
+    }
         
 
 }
