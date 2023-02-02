@@ -7,15 +7,32 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 {
     public CharacterController controller; // creates a input on our player in unity called controller so we can input our character controller so we can link that to this script and interact with it through here
 
-    public float MC_PlayerSpeed = 20f;
-    public float MC_gravity = -12f;
-    public float MC_JumpHeight = 100f;
+    [SerializeField] private Camera playerCamera;
+
+    [SerializeField] private  float MC_PlayerSpeed;
+    [SerializeField] private  float MC_gravity;
+    [SerializeField] private float MC_JumpHeight;
+    [SerializeField] private float MC_SprintSpeed;
+    [SerializeField] private float ySpeed;
     public Vector3 playerVelocity;
-    public Rigidbody MC_rb;
 
     [SerializeField]
     private GameObject powerupParticle;
     private ParticleSystem powerupParticleSystem;
+
+    private float defaultFov;
+    private  float dampingVelocity = 0f;
+    private float targetFov;
+
+    private bool hasVaulted = false;
+
+    private float jumpBuffer;
+    private float jumpBufferMax = 0.25f;
+    private float jumpDelay;
+
+    [SerializeField]private float dodgeDuration;
+    private bool dodging;
+    [SerializeField] private float dodgePower;
     
 
 
@@ -31,35 +48,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     void Start()
     {
         powerupParticleSystem = powerupParticle.GetComponent<ParticleSystem>();
+        defaultFov = playerCamera.fieldOfView;
     }
 
-
-    void FixedUpdate() // fixed update makes jump that uses rigid body work better and smoother
-    {
-        MC_isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask); // this is the boolean that we check the ground for, Physics.CheckSphere is in unity already and will create a sphere for us at the ground check position with ground check distance and check for the ground mask layer we want
-
-        if (MC_isGrounded && playerVelocity.y < 0) // checks if we are grounded and if our velocity is at less than 0 then make our velocity to -2, -2 is just a nice sweet spot for grounded velocity
-        {
-            playerVelocity.y = -2f;
-            Mathf.Sqrt(MC_JumpHeight * -3.0f * MC_gravity);
-        }
-
-
-        if (Input.GetButton("Jump") && MC_isGrounded == true)
-        {
-            MC_rb.AddForce(transform.up * MC_JumpHeight); // jump mechanic that uses rigid body instead of character controller as rigid body has gravity etc included so its far easier
-        }
-
-        playerVelocity.y += MC_gravity * Time.deltaTime;     //comment this line out in for gravity if you add the ground checker not equal if statement right below this
-
-
-
-        //if (MC_isGrounded != true) // read noob :)
-        //{
-        //    playerVelocity.y = -2f; // this is to limit the player to falling at the same continous speed, can remove it and the gravity will paly out just added it cause didnt know what people wanted to do 
-        //}
-
-    }
 
 
     void Update() // used a normal update for things that use a character controller as fixed update is mainly for built in physics whereas normal update i created my own gravity etc so this just smoothes things out slightly
@@ -71,16 +62,137 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         Vector3 move = transform.right * x + transform.forward * z; // creates a Vector3 which is a variable called move with 3 presets of coordinates for us already, so we transform the right by x variable and forward by z variable these are on the same line so we can move in either direction at the same time
         //transform.right and transform.forward are things unity already recognises this also makes sure that if we move forward but look right we will move where our camera is 
+        if (Input.GetKey("left shift")){
+            move *= MC_SprintSpeed;
+            Vector3 fovVelocity = Vector3.zero;
+            targetFov = defaultFov + 20;
+        }
+        else
+        {
+            targetFov = defaultFov;
+        }
+        float magnitude = Mathf.Clamp01(move.magnitude) * MC_PlayerSpeed; // Clamps the magnitude of the move vector so that u dont go faster diagonally, also times by movement speed
 
+        jumpDelay -= Time.deltaTime;
 
-        controller.Move(move * MC_PlayerSpeed * Time.deltaTime); // moves our character controller we inputted by the vector3 variable multiplied by the speed we initialised then multiplied by time delta, this ensures we move at a constant speed in correlation to our fps so there is no stuttering etc
+        if (Input.GetButton("Jump") && jumpDelay <= 0)
+        {
+            jumpBuffer = jumpBufferMax;
+        }
+        else
+        {
+            jumpBuffer -= Time.deltaTime;
+        }
 
-        velocity.y += MC_gravity * Time.deltaTime; //velocity is gravity * speed your going so thats the maths eqation we add
+        ySpeed += MC_gravity * Time.deltaTime;
+        if (controller.isGrounded){
+            hasVaulted = false;
+            ySpeed = -0.5f;
+            if (jumpBuffer > 0f)
+            {
+                ySpeed = MC_JumpHeight;
+                jumpBuffer = 0f;
+            }
+        }
 
-        controller.Move(velocity * Time.deltaTime); // weve already done our velocity eqaution here to say how much on the y axis we can fall if we are in the air how fast etc, 
-                                                    // but we have to times it by time delta again because the amount we want to move on the y is gravity * time squared but we only multiplied it once in our velocity eqation so we just simply multiply it again here
-                                                    // sorry thats just maths, thats just the eqation we have to do to find our velocity
+        Vector3 velocity = move * MC_PlayerSpeed;
+        velocity.y = ySpeed;
+        controller.Move(velocity * Time.deltaTime); // moves our character controller we inputted by the vector3 variable multiplied by the speed we initialised then multiplied by time delta, this ensures we move at a constant speed in correlation to our fps so there is no stuttering etc
+        
+        // Changes the cameras FOV depending on if the value of the targetFov value
+        playerCamera.fieldOfView = Mathf.SmoothDamp(playerCamera.fieldOfView, targetFov, ref dampingVelocity, 0.1f);
 
+        if (!controller.isGrounded && jumpBuffer > 0 && !hasVaulted)
+        {
+        jumpBuffer = 0f;
+        RaycastHit hitData;
+        if (Physics.Raycast(groundCheck.transform.position, groundCheck.transform.TransformDirection(Vector3.forward), out hitData, 2, ~7))
+            {
+            Vector3 vaultLocation = hitData.point;
+            float vaultHeight = ((hitData.transform.gameObject.GetComponent<BoxCollider>().size.y * hitData.transform.localScale.y));
+            float vaultHeightWorld = (vaultHeight/2) + hitData.transform.position.y;
+            GameObject vaultObject = hitData.transform.gameObject;
+            float vaultDistance = vaultHeightWorld - vaultLocation.y;
+            if (vaultDistance <= 2)
+                {
+                    hasVaulted = true;
+                    transform.position += (transform.forward*hitData.distance);
+                    transform.position += new Vector3(0, vaultDistance + 0.25f, 0);
+                    ySpeed = -0.5f;
+                    jumpDelay = 0.25f;
+                }
+            }
+        }
+
+        if (!dodging)
+        {
+            if (Input.GetKey(KeyCode.Q))
+            {
+                StartCoroutine(Dodge(-transform.right*dodgePower+transform.position));
+//                playerCamera.transform.DORotate(new Vector3(0,0,10), dodgeDuration/2, RotateMode.LocalAxisAdd).SetLoops(2, LoopType.Yoyo).SetEase(Ease.InOutSine);
+                StartCoroutine(CameraTilt(dodgeDuration, Quaternion.Euler(0,0,19f)));
+            }
+            if (Input.GetKey(KeyCode.E))
+            {
+                StartCoroutine(Dodge(transform.right*dodgePower+transform.position));
+                StartCoroutine(CameraTilt(dodgeDuration, Quaternion.Euler(0,0,-10f)));
+            }
+        }
+
+            
+
+    }
+
+    IEnumerator CameraTilt(float duration, Quaternion tilt)
+    {
+        float tiltTime = 0f;
+
+        Quaternion startTilt = playerCamera.transform.rotation;
+        Quaternion endTilt = startTilt * tilt;
+
+        Quaternion newRot = playerCamera.transform.rotation;
+        Quaternion oldRot = playerCamera.transform.rotation;
+
+        while (tiltTime < duration)
+            if (tiltTime <= duration/2)
+                {
+                    playerCamera.transform.rotation = Quaternion.Slerp(startTilt, endTilt,Mathf.SmoothStep(0.0f,1.0f,tiltTime/duration));
+                    tiltTime += Time.deltaTime;
+                    yield return null;
+                }
+            else
+                {
+                    playerCamera.transform.rotation = Quaternion.Slerp(endTilt, startTilt,Mathf.SmoothStep(0.0f,1.0f,tiltTime/duration));
+                    tiltTime += Time.deltaTime;
+                    yield return null;
+                }
+    }
+
+    IEnumerator Dodge(Vector3 endPos)
+    {
+        dodging = true;
+        Vector3 startPos = transform.position;
+        Vector3 newPos = transform.position;
+        Vector3 oldPos = transform.position;
+
+        float dodgeTime = 0f;
+
+        while (dodgeTime < dodgeDuration)
+        {
+            newPos = transform.position;
+            Vector3 diff = newPos - oldPos;
+            startPos += diff;
+            endPos += diff;
+            // This chunk of code will move the start and end positions of the dodge movement each frame to match with the movement of the player. This means their position wont freeze when they dodge
+
+            transform.position = Vector3.Lerp(startPos, endPos,Mathf.SmoothStep(0.0f,1.0f,Mathf.SmoothStep(0.0f,1.0f,dodgeTime/dodgeDuration)));
+            dodgeTime += Time.deltaTime;
+
+            oldPos = transform.position
+            ;
+            yield return null;
+        }
+        dodging = false;
     }
 
     IEnumerator Powerup_Effect()
