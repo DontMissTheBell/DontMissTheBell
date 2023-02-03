@@ -15,7 +15,8 @@ public class Powerup : MonoBehaviour
     public ParticleSystem particles;
 
     // Determines the type of Powerup
-    // 1 = Speedboost
+    // 1 = Speed boost
+    // 2 = Jump boost
     public int variant;
 
     
