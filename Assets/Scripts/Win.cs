@@ -11,11 +11,12 @@ public class Win : MonoBehaviour
     {
         objectives = homework.GetComponent<Objectives>();
     }
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider collider)
     {
-        if(other.gameObject.name == "MainCharacter" && objectives.HomeworkCompleted)
+        if(collider.gameObject.name == "MainCharacter" && objectives.HomeworkCompleted)
         {
                 Debug.Log("Win");
+               //output 
         }
     }
 }
