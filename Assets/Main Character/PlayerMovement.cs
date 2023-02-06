@@ -35,12 +35,11 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField]private float dodgeDuration;
     private bool dodging;
     [SerializeField] private float dodgePower;
-    
 
 
     public Transform groundCheck; // creates an input in unity we can put our epty ground check object into
     public float groundDistance = 0.4f; // will be used later to make the sphere check for 0.4 towards the ground
-    public LayerMask groundMask; // a layer mask is in unity and is just a layer you can create
+    public LayerMask groundMask, vaultMask; // a layer mask is in unity and is just a layer you can create
     
 
     bool MC_isGrounded; // boolean to see if its grounded, this is all to make sure our velocity isnt still gradually increasing if we are on the ground
@@ -115,7 +114,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         jumpBuffer = 0f;
         // Next it performs a raycast, to check if the player is infront of an object they can vault
         RaycastHit hitData;
-        if (Physics.Raycast(groundCheck.transform.position, groundCheck.transform.TransformDirection(Vector3.forward), out hitData, 2, ~7))
+        if (Physics.Raycast(groundCheck.transform.position, groundCheck.transform.TransformDirection(Vector3.forward), out hitData, 2, vaultMask.value))
             {
             // Then it does some math, with the output being the distance of the player from the top of the wall.
             // This is then used to determine if the player is high enough to vault, as well as how high they need to go in order to be moved ontop of the object
