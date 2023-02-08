@@ -62,6 +62,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField] private float wallJumpBufferMax = 0.5f;
     private float wallRunTime;
     private float extraWallRunSpeed;
+    private float wallRunTilt;
+    [SerializeField] private float wallRunTiltMax;
 
 
     
@@ -100,20 +102,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         // Smoothly changes the cameras FOV depending on if the value of the targetFov value
         playerCamera.fieldOfView = Mathf.SmoothDamp(playerCamera.fieldOfView, targetFov, ref dampingVelocity, 0.1f);
 
-        if (!dodging)
-        {
-            // Checks if the player is going left or right by checking their horizontal axis, and also checks if they click their mouse
-            if (Input.GetAxisRaw("Horizontal") == -1 && Input.GetMouseButtonDown(1))
-            {
-                StartCoroutine(Dodge(-transform.right*dodgePower+transform.position));
-                cameraScript.TiltScreen(dodgeDuration,10f);
-            }
-            if (Input.GetAxisRaw("Horizontal") == 1 && Input.GetMouseButtonDown(1))
-            {
-                StartCoroutine(Dodge(transform.right*dodgePower+transform.position));
-                cameraScript.TiltScreen(dodgeDuration,-10f);
-            }
-        }
     }
 
     private void MovementState()
@@ -174,6 +162,23 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                         jumpBuffer = 0f;
                     }
                 }
+
+                if (!dodging)
+                {
+                    // Checks if the player is going left or right by checking their horizontal axis, and also checks if they click their mouse
+                    if (Input.GetAxisRaw("Horizontal") == -1 && Input.GetMouseButtonDown(1))
+                    {
+                        StartCoroutine(Dodge(-transform.right*dodgePower+transform.position));
+                        StartCoroutine(cameraScript.QuickTiltScreen(dodgeDuration,10f));
+                    }
+                    if (Input.GetAxisRaw("Horizontal") == 1 && Input.GetMouseButtonDown(1))
+                    {
+                        StartCoroutine(Dodge(transform.right*dodgePower+transform.position));
+                        StartCoroutine(cameraScript.QuickTiltScreen(dodgeDuration,-10f));
+                    }
+                }
+
+
                 if (!OnGround())
                     {
                         if (CheckVault() && jumpBuffer > 0)
@@ -231,6 +236,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         ySpeed = 0;
         canWallJump = false;
         wallRunTime = 0f;
+        wallRunTilt = canWallRunRight ? wallRunTiltMax : -wallRunTiltMax;
+        cameraScript.StartTiltScreen(0.25f, wallRunTilt, false);
         if (isSprinting)
         {
             extraWallRunSpeed = 2;
@@ -247,6 +254,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         mState = movementStates.Run;
         canWallJump = false;
         canWallRun = false;
+        cameraScript.StartTiltScreen(0.25f, wallRunTilt, true);
     }
 
     private bool CheckVault()

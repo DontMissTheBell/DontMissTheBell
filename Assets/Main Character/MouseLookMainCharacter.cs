@@ -16,6 +16,8 @@ public class MouseLookMainCharacter : MonoBehaviour
     private float startTilt;
     private float tiltTarget;
 
+    private bool isTilting;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked; // hides the cursor
@@ -37,33 +39,45 @@ public class MouseLookMainCharacter : MonoBehaviour
         xRotation = Mathf.Clamp(xRotation, -90f, 90f); // ensures we cant look below or behind us
 
 
-        if (tiltTime < tiltDuration){ //If the screen if being tilted then this chunk of code is ran instead to alter the Z rotation of the camera
-            if (tiltTime <= tiltDuration/2) // This will smoothly tilt the screen back and forward for the duration of the tiltDuration
-               {
-                   transform.localRotation = Quaternion.Euler(xRotation,transform.localRotation.y,Mathf.Lerp(startTilt, tiltTarget,Mathf.SmoothStep(0.0f,1.0f,tiltTime/tiltDuration)));
-               }
-           else
-               {
-                   transform.localRotation = Quaternion.Euler(xRotation,transform.localRotation.y,Mathf.Lerp(tiltTarget, startTilt,Mathf.SmoothStep(0.0f,1.0f,tiltTime/tiltDuration)));
-               }
+        if (isTilting){ //If the screen if being tilted then this chunk of code is ran instead to alter the Z rotation of the camera
+            {
+                transform.localRotation = Quaternion.Euler(xRotation,transform.localRotation.y,Mathf.Lerp(startTilt, tiltTarget,Mathf.SmoothStep(0.0f,1.0f,tiltTime/tiltDuration)));
+            }
             tiltTime += Time.deltaTime;
         }
         else // If the screen isnt being tilted, then it runs the default rotation code
         {
-            transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f); // is making sure we can only roate the player along the correct axis so it isnt all 3 axis at once and only the z axis
+            transform.localRotation = Quaternion.Euler(xRotation, transform.localRotation.y, transform.localRotation.z); // is making sure we can only roate the player along the correct axis so it isnt all 3 axis at once and only the z axis
         }
 
         playerBody.Rotate(Vector3.up * mouseX); // rotates whatever transform we put into the Transform variable at the start for us it will be the player, then it will rotate the player alongside the camera
     }
 
-    public void TiltScreen(float duration, float tilt)
+    public void StartTiltScreen(float duration, float tilt, bool reverse)
     {
+        isTilting = true;
+
+        startTilt = transform.localRotation.z;
+        tiltTarget = startTilt + tilt;
+
+        if (reverse)
+        {
+            (startTilt, tiltTarget) = (tiltTarget, startTilt);
+        }
+
         tiltTime = 0f;
         tiltDuration = duration;
 
-        startTilt = transform.rotation.z;
-        tiltTarget = startTilt + tilt;
+    }
 
+
+    public IEnumerator QuickTiltScreen(float duration, float tilt)
+    {
+        StartTiltScreen(duration/2,tilt,false);
+        yield return new WaitForSeconds(duration/2);
+        StartTiltScreen(duration/2,tilt,true);
+        yield return new WaitForSeconds(duration/2);
+        isTilting = false;
     }
 
 }
