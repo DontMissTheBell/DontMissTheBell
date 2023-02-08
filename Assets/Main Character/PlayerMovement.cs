@@ -26,8 +26,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private  float dampingVelocity = 0f;
     private float targetFov;
 
-    private bool hasVaulted = false;
-
     private float jumpBuffer;
     [SerializeField] private float jumpBufferMax = 0.25f; // The time frame that the game will store the players jump input
     private float jumpDelay;
@@ -40,6 +38,28 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     public Transform groundCheck; // creates an input in unity we can put our epty ground check object into
     public float groundDistance = 0.4f; // will be used later to make the sphere check for 0.4 towards the ground
     public LayerMask groundMask, vaultMask; // a layer mask is in unity and is just a layer you can create
+
+    private enum movementStates{Run, WallRun, Slide, Dodge}
+    private movementStates mState = movementStates.Run;
+
+    private RaycastHit vaultData;
+
+    [Header("Wall Run")]
+    [SerializeField] private float wallJumpForce;
+
+    private RaycastHit leftWallData;
+    private RaycastHit rightWallData;
+    private bool canWallRunRight;
+    private bool canWallRunLeft;
+    private bool canWallJump;
+    private bool canWallRun;
+    private Vector3 wallJumpDistance;
+    private float wallJumpTime;
+    [SerializeField] private float wallJumpTimeMax;
+    [SerializeField] private float wallRunSpeed;
+    [SerializeField] private float wallJumpBufferMax = 0.5f;
+
+
     
 
     bool MC_isGrounded; // boolean to see if its grounded, this is all to make sure our velocity isnt still gradually increasing if we are on the ground
@@ -50,6 +70,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     {
         powerupParticleSystem = powerupParticle.GetComponent<ParticleSystem>();
         defaultFov = playerCamera.fieldOfView;
+        targetFov = defaultFov;
 
         cameraScript = playerCamera.GetComponent<MouseLookMainCharacter>();
     }
@@ -59,80 +80,10 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     void Update() // used a normal update for things that use a character controller as fixed update is mainly for built in physics whereas normal update i created my own gravity etc so this just smoothes things out slightly
     {
 
+        MovementState();
 
-        float x = Input.GetAxis("Horizontal"); // checks if there is a horizontal input from either a or d these are values unity is already aware of, and assings them to x (a is -1 and d is 1)
-        float z = Input.GetAxis("Vertical"); // checks if there is a vertical input from either w or s these are values unity is already aware of, and assings them to z (w is -1 and s is 1)
-
-        Vector3 move = transform.right * x + transform.forward * z; // creates a Vector3 which is a variable called move with 3 presets of coordinates for us already, so we transform the right by x variable and forward by z variable these are on the same line so we can move in either direction at the same time
-        //transform.right and transform.forward are things unity already recognises this also makes sure that if we move forward but look right we will move where our camera is 
-
-
-        if (Input.GetKey("left shift")){ // If shift is held, then it increases the vector used to determine the distance the player travels the next frame
-            move *= MC_SprintSpeed;
-            targetFov = defaultFov + 20;
-        }
-        else
-        {
-            targetFov = defaultFov;
-        }
-        float magnitude = Mathf.Clamp01(move.magnitude) * MC_PlayerSpeed; // Clamps the magnitude of the move vector so that u dont go faster diagonally, also times by movement speed
-
-
-        jumpDelay -= Time.deltaTime; // This code handles the jump buffering system
-        if (Input.GetButton("Jump") && jumpDelay <= 0)
-        {
-            jumpBuffer = jumpBufferMax;
-        }
-        else
-        {
-            jumpBuffer -= Time.deltaTime;
-        }
-
-        // This code handles the gravity of the player
-        ySpeed += MC_gravity * Time.deltaTime;
-
-        if (controller.isGrounded){
-            hasVaulted = false;
-            ySpeed = -0.5f;
-            if (jumpBuffer > 0f)
-            {
-                ySpeed = MC_JumpHeight;
-                jumpBuffer = 0f;
-            }
-        }
-
-        Vector3 velocity = move * MC_PlayerSpeed;
-        velocity.y = ySpeed;
-        controller.Move(velocity * Time.deltaTime); // moves our character controller we inputted by the vector3 variable multiplied by the speed we initialised then multiplied by time delta, this ensures we move at a constant speed in correlation to our fps so there is no stuttering etc
-        
         // Smoothly changes the cameras FOV depending on if the value of the targetFov value
         playerCamera.fieldOfView = Mathf.SmoothDamp(playerCamera.fieldOfView, targetFov, ref dampingVelocity, 0.1f);
-
-        // This code handles the vaulting mechanic. First it checks if the player jumps while in the air
-        if (!controller.isGrounded && jumpBuffer > 0 && !hasVaulted)
-        {
-        jumpBuffer = 0f;
-        // Next it performs a raycast, to check if the player is infront of an object they can vault
-        RaycastHit hitData;
-        if (Physics.Raycast(groundCheck.transform.position, groundCheck.transform.TransformDirection(Vector3.forward), out hitData, 2, vaultMask.value))
-            {
-            // Then it does some math, with the output being the distance of the player from the top of the wall.
-            // This is then used to determine if the player is high enough to vault, as well as how high they need to go in order to be moved ontop of the object
-            Vector3 vaultLocation = hitData.point;
-            float vaultHeight = ((hitData.transform.gameObject.GetComponent<BoxCollider>().size.y * hitData.transform.localScale.y));
-            float vaultHeightWorld = (vaultHeight/2) + hitData.transform.position.y;
-            GameObject vaultObject = hitData.transform.gameObject;
-            float vaultDistance = vaultHeightWorld - vaultLocation.y;
-            if (vaultDistance <= 2) // If the player is high enough to vault, then they are moved the correct distance to the top of the object
-                {
-                    hasVaulted = true;
-                    transform.position += (transform.forward*hitData.distance);
-                    transform.position += new Vector3(0, vaultDistance + 0.25f, 0);
-                    ySpeed = -0.5f;
-                    jumpDelay = 0.25f;
-                }
-            }
-        }
 
         if (!dodging)
         {
@@ -148,9 +99,205 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 cameraScript.TiltScreen(dodgeDuration,-10f);
             }
         }
+    }
 
+    private void MovementState()
+    {
+        if (mState == movementStates.Run)
+        {
+                float x = Input.GetAxis("Horizontal"); // checks if there is a horizontal input from either a or d these are values unity is already aware of, and assings them to x (a is -1 and d is 1)
+                float z = Input.GetAxis("Vertical"); // checks if there is a vertical input from either w or s these are values unity is already aware of, and assings them to z (w is -1 and s is 1)
+
+                Vector3 move = transform.right * x + transform.forward * z; // creates a Vector3 which is a variable called move with 3 presets of coordinates for us already, so we transform the right by x variable and forward by z variable these are on the same line so we can move in either direction at the same time
+                //transform.right and transform.forward are things unity already recognises this also makes sure that if we move forward but look right we will move where our camera is 
+
+                if (Input.GetKey("left shift"))
+                { // If shift is held, then it increases the vector used to determine the distance the player travels the next frame
+                    move *= MC_SprintSpeed;
+                    targetFov = defaultFov + 20;
+                }
+                else
+                {
+                    targetFov = defaultFov;
+                }
+
+
+                float magnitude = Mathf.Clamp01(move.magnitude) * MC_PlayerSpeed; // Clamps the magnitude of the move vector so that u dont go faster diagonally, also times by movement speed
+
+                Vector3 velocity = move * MC_PlayerSpeed;
+
+                velocity.y = ySpeed;
+
+                // This code handles the gravity of the player
+                ySpeed += MC_gravity * Time.deltaTime;
+
+
+                // If the player has walljumped
+                if (wallJumpTime <= wallJumpTimeMax)
+                {
+                    Vector3 currentJumpDistance = Vector3.Lerp(wallJumpDistance, Vector3.zero, wallJumpTime/wallJumpTimeMax);
+                    velocity += currentJumpDistance;
+
+
+                    wallJumpTime += Time.deltaTime;
+
+
+                }
+                
+                controller.Move(velocity * Time.deltaTime); // moves our character controller we inputted by the vector3 variable multiplied by the speed we initialised then multiplied by time delta, this ensures we move at a constant speed in correlation to our fps so there is no stuttering etc
+
+                jumpDelay -= Time.deltaTime; // This code handles the jump buffering system
+                if (Input.GetButton("Jump") && jumpDelay <= 0)
+                {
+                    jumpBuffer = jumpBufferMax;
+                }
+                else
+                {
+                    jumpBuffer -= Time.deltaTime;
+                }
+                if (controller.isGrounded)
+                {
+                    ySpeed = -0.5f;
+                    canWallRun = true;
+                    if (jumpBuffer > 0f)
+                    {
+                        ySpeed = MC_JumpHeight;
+                        jumpBuffer = 0f;
+                    }
+                }
+                if (!OnGround())
+                    {
+                        if (CheckVault() && jumpBuffer > 0)
+                        {
+                            Vault();
+                        }
+                        if (CheckWallRun() && canWallRun && jumpBuffer > 0)
+                        {
+                            StartWallRun();
+                        }
+                    }
+        }
+        if (mState == movementStates.WallRun)
+        {
+            WallRun();
+            if (!CheckWallRun())
+                {
+                    EndWallRun();
+                }
+            if (!canWallJump)
+                {
+                if (Input.GetButton("Jump"))
+                {
+                    jumpBuffer = wallJumpBufferMax;
+                }
+                else
+                {
+                    jumpBuffer -= Time.deltaTime;
+                    if ((wallJumpBufferMax - jumpBuffer) > 0.05)
+                    {
+                        canWallJump = true;
+                    }
+                }
+            }
+            else
+            {
+                jumpBuffer -= Time.deltaTime;
+                if (Input.GetButton("Jump"))
+                {
+                    WallJump();
+                    EndWallRun();
+                }
+                if (jumpBuffer <= 0)
+                {
+                    EndWallRun();
+                }
+            }
+        }
+
+    }
+
+    private void StartWallRun()
+    {
+        mState = movementStates.WallRun;
+        ySpeed = 0;
+        canWallJump = false;
+
+        Vector3 normal = canWallRunRight ? rightWallData.normal : leftWallData.normal;
+        controller.Move(-normal*3);
+        controller.Move(normal*0.5f);
+    }
+
+    private void EndWallRun()
+    {
+        mState = movementStates.Run;
+        canWallJump = false;
+        canWallRun = false;
+    }
+
+    private bool CheckVault()
+    {
+        // Here it performs a raycast, to check if the player is infront of an object they can vault
+        return Physics.Raycast(groundCheck.transform.position, groundCheck.transform.TransformDirection(Vector3.forward), out vaultData, 2, vaultMask.value);
+    }
+    private bool CheckWallRun()
+    {
+        canWallRunLeft = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.left), out leftWallData, 2f, vaultMask.value);
+        canWallRunRight = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out rightWallData, 2f, vaultMask.value);
+        if (canWallRunRight)
+        {
+            return canWallRunRight;
+        }
+        if (canWallRunLeft)
+        {
+            return canWallRunLeft;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private void WallJump()
+    {
+        Vector3 normal = canWallRunRight ? rightWallData.normal : leftWallData.normal;
+
+        wallJumpDistance = transform.up * MC_JumpHeight + normal * wallJumpForce;
+        wallJumpTime = 0;
+        jumpDelay = 0.25f;
+        jumpBuffer = 0;
+
+
+    }
+
+    private void WallRun()
+    {
+        Vector3 normal = canWallRunRight ? rightWallData.normal : leftWallData.normal;
+        Vector3 forward = Vector3.Cross(normal, transform.up);
+
+        if((transform.forward - forward).magnitude > (transform.forward - -forward).magnitude)
+            forward = -forward;
+
+        controller.Move(new Vector3(forward.x,0,forward.z)*(wallRunSpeed*Time.deltaTime));
+    }
+
+    private void Vault()
+    {
+        jumpBuffer = 0f;
+        // Here it does some math, with the output being the distance of the player from the top of the wall.
+        // This is then used to determine if the player is high enough to vault, as well as how high they need to go in order to be moved ontop of the object
+        Vector3 vaultLocation = vaultData.point;
+        float vaultHeight = ((vaultData.transform.gameObject.GetComponent<BoxCollider>().size.y * vaultData.transform.localScale.y));
+        float vaultHeightWorld = (vaultHeight/2) + vaultData.transform.position.y;
+        GameObject vaultObject = vaultData.transform.gameObject;
+        float vaultDistance = vaultHeightWorld - vaultLocation.y;
+        if (vaultDistance <= 2) // If the player is high enough to vault, then they are moved the correct distance to the top of the object
+            {
+                transform.position += (transform.forward*vaultData.distance);
+                transform.position += new Vector3(0, vaultDistance + 0.25f, 0);
+                ySpeed = -0.5f;
+                jumpDelay = 0.25f;
+            }
             
-
     }
 
     IEnumerator Dodge(Vector3 endPos)
@@ -226,6 +373,11 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             StartCoroutine(Powerup_Effect());
         }
 
+    }
+
+    private bool OnGround()
+    {
+        return Physics.Raycast(transform.position, Vector3.down, 2, groundMask.value);
     }
         
 

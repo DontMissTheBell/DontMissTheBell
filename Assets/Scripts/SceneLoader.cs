@@ -19,6 +19,7 @@ public class SceneLoader : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene("Test");
+        Destroy(gameObject);
+        GameManager.LoadScene("Test",0.5f);
     }
 }

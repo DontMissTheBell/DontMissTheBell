@@ -19,6 +19,14 @@ public class PauseMenu : MonoBehaviour
             Time.timeScale = 1.0f - Time.timeScale;
             Globals.instance.gamePaused = 0.0f == Time.timeScale;
             gameObject.GetComponentInChildren<Canvas>(includeInactive: true).enabled = 0.0f == Time.timeScale;
+            if (Time.timeScale == 1.0f)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+            }
         }
     }
 }
