@@ -11267,6 +11267,7 @@ MonoBehaviour:
   wallJumpTimeMax: 0.5
   wallRunSpeed: 15
   wallJumpBufferMax: 0.5
+  wallRunTiltMax: 7.5
 --- !u!143 &1384013142
 CharacterController:
   m_ObjectHideFlags: 0
