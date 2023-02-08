@@ -17,6 +17,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField] private float ySpeed; // The speed the player is falling
     public Vector3 playerVelocity;
 
+    private bool isSprinting;
+
 
     [SerializeField] // The particle objects attached to the camera
     private GameObject powerupParticle; 
@@ -58,6 +60,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField] private float wallJumpTimeMax;
     [SerializeField] private float wallRunSpeed;
     [SerializeField] private float wallJumpBufferMax = 0.5f;
+    private float wallRunTime;
+    private float extraWallRunSpeed;
 
 
     
@@ -79,6 +83,17 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     void Update() // used a normal update for things that use a character controller as fixed update is mainly for built in physics whereas normal update i created my own gravity etc so this just smoothes things out slightly
     {
+        
+        if (Input.GetKey("left shift"))
+            { // Checks if the player is holding down the sprint key
+                targetFov = defaultFov + 20;
+                isSprinting = true;
+            }
+            else
+            {
+                targetFov = defaultFov;
+                isSprinting = false;
+            }
 
         MovementState();
 
@@ -111,16 +126,10 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 Vector3 move = transform.right * x + transform.forward * z; // creates a Vector3 which is a variable called move with 3 presets of coordinates for us already, so we transform the right by x variable and forward by z variable these are on the same line so we can move in either direction at the same time
                 //transform.right and transform.forward are things unity already recognises this also makes sure that if we move forward but look right we will move where our camera is 
 
-                if (Input.GetKey("left shift"))
-                { // If shift is held, then it increases the vector used to determine the distance the player travels the next frame
-                    move *= MC_SprintSpeed;
-                    targetFov = defaultFov + 20;
-                }
-                else
+                if (isSprinting)
                 {
-                    targetFov = defaultFov;
+                    move *= MC_SprintSpeed;
                 }
-
 
                 float magnitude = Mathf.Clamp01(move.magnitude) * MC_PlayerSpeed; // Clamps the magnitude of the move vector so that u dont go faster diagonally, also times by movement speed
 
@@ -193,7 +202,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 else
                 {
                     jumpBuffer -= Time.deltaTime;
-                    if ((wallJumpBufferMax - jumpBuffer) > 0.05)
+                    if ((wallJumpBufferMax - jumpBuffer) > 0.1)
                     {
                         canWallJump = true;
                     }
@@ -221,10 +230,16 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         mState = movementStates.WallRun;
         ySpeed = 0;
         canWallJump = false;
+        wallRunTime = 0f;
+        if (isSprinting)
+        {
+            extraWallRunSpeed = 2;
+        }
+        else
+        {
+            extraWallRunSpeed = 1;
+        }
 
-        Vector3 normal = canWallRunRight ? rightWallData.normal : leftWallData.normal;
-        controller.Move(-normal*3);
-        controller.Move(normal*0.5f);
     }
 
     private void EndWallRun()
@@ -272,12 +287,19 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private void WallRun()
     {
         Vector3 normal = canWallRunRight ? rightWallData.normal : leftWallData.normal;
+        float length = canWallRunRight ? rightWallData.distance : leftWallData.distance;
         Vector3 forward = Vector3.Cross(normal, transform.up);
 
         if((transform.forward - forward).magnitude > (transform.forward - -forward).magnitude)
             forward = -forward;
 
-        controller.Move(new Vector3(forward.x,0,forward.z)*(wallRunSpeed*Time.deltaTime));
+        if (wallRunTime <= 0.15){
+        forward = Vector3.Lerp(forward,forward + (-normal*(length-1f)),wallRunTime/0.15f);
+        }
+
+        wallRunTime += Time.deltaTime;
+
+        controller.Move(new Vector3(forward.x,0,forward.z)*(wallRunSpeed*extraWallRunSpeed*Time.deltaTime));//
     }
 
     private void Vault()
