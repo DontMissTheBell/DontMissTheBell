@@ -87,7 +87,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     void Update() // used a normal update for things that use a character controller as fixed update is mainly for built in physics whereas normal update i created my own gravity etc so this just smoothes things out slightly
     {
-        
+        ResetScene();
 
         if (Input.GetKey("left shift"))
             { // Checks if the player is holding down the sprint key
@@ -104,18 +104,17 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         // Smoothly changes the cameras FOV depending on if the value of the targetFov value
         playerCamera.fieldOfView = Mathf.SmoothDamp(playerCamera.fieldOfView, targetFov, ref dampingVelocity, 0.1f);
-
-        ResetScene();
-
+                        
     }
 
     public void ResetScene()
     {
-        if (MC_Health >= 0)
+        if (MC_Health == 0)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             //Debug.Log("Health is: " + MC_Health);
         }
+        
     }
 
     private void MovementState()
@@ -344,7 +343,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             
     }
 
-    private void OnControllerColliderHit(ControllerColliderHit MC_FallDamage)
+    public void OnControllerColliderHit(ControllerColliderHit MC_FallDamage)
     {
         if (ySpeed <= -40f)
         {
