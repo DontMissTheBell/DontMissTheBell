@@ -111,7 +111,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     public void ResetScene()
     {
-        if (MC_Health == 0)
+        if (MC_Health >= 0)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             //Debug.Log("Health is: " + MC_Health);

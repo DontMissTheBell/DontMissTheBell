@@ -11245,6 +11245,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 1384013142}
   playerCamera: {fileID: 682945957}
+  MC_Health: 1
   MC_PlayerSpeed: 10
   MC_gravity: -30
   MC_JumpHeight: 10
@@ -11302,7 +11303,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1384013140}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -52.1, y: 22.62, z: -69.53}
+  m_LocalPosition: {x: 0, y: 22.62, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
