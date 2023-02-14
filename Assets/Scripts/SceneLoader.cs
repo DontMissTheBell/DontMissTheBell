@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -22,4 +23,5 @@ public class SceneLoader : MonoBehaviour
         Destroy(gameObject);
         GameManager.LoadScene("Test",0.5f);
     }
+
 }

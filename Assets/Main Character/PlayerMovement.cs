@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour // used MC_ for main character variables to cause less confusion later on
 {
@@ -10,6 +11,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField] private Camera playerCamera;
     private MouseLookMainCharacter cameraScript;
 
+    [SerializeField] private int MC_Health; 
     [SerializeField] private  float MC_PlayerSpeed;
     [SerializeField] private  float MC_gravity;
     [SerializeField] private float MC_JumpHeight;
@@ -86,6 +88,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     void Update() // used a normal update for things that use a character controller as fixed update is mainly for built in physics whereas normal update i created my own gravity etc so this just smoothes things out slightly
     {
         
+
         if (Input.GetKey("left shift"))
             { // Checks if the player is holding down the sprint key
                 targetFov = defaultFov + 20;
@@ -102,6 +105,17 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         // Smoothly changes the cameras FOV depending on if the value of the targetFov value
         playerCamera.fieldOfView = Mathf.SmoothDamp(playerCamera.fieldOfView, targetFov, ref dampingVelocity, 0.1f);
 
+        ResetScene();
+
+    }
+
+    public void ResetScene()
+    {
+        if (MC_Health == 0)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            //Debug.Log("Health is: " + MC_Health);
+        }
     }
 
     private void MovementState()
@@ -329,6 +343,20 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             }
             
     }
+
+    private void OnControllerColliderHit(ControllerColliderHit MC_FallDamage)
+    {
+        if (ySpeed <= -40f)
+        {
+            MC_Health = MC_Health -= 1;
+        }
+        else
+        {
+            MC_Health = MC_Health;         
+        }
+        return;        
+    }
+
 
     IEnumerator Dodge(Vector3 endPos)
     {
