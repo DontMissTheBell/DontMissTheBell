@@ -12,6 +12,7 @@ public class Objectives : MonoBehaviour
         if (other.gameObject.name == "MainCharacter")
         {
             HomeworkCompleted = true;
+            Debug.Log("Homework Obtained");
         }
     }
 }
