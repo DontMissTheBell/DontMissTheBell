@@ -11529,7 +11529,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 1384013142}
   playerCamera: {fileID: 682945957}
-  MC_Health: 0
+  MC_Health: 50
   MC_PlayerSpeed: 10
   MC_gravity: -30
   MC_JumpHeight: 10
@@ -11547,12 +11547,12 @@ MonoBehaviour:
     m_Bits: 192
   vaultMask:
     serializedVersion: 2
-    m_Bits: 0
-  wallJumpForce: 0
-  wallJumpTimeMax: 0
-  wallRunSpeed: 0
+    m_Bits: 128
+  wallJumpForce: 20
+  wallJumpTimeMax: 0.5
+  wallRunSpeed: 15
   wallJumpBufferMax: 0.5
-  wallRunTiltMax: 0
+  wallRunTiltMax: 7.5
 --- !u!143 &1384013142
 CharacterController:
   m_ObjectHideFlags: 0

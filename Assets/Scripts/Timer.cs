@@ -22,7 +22,6 @@ public class Timer : MonoBehaviour
         if (TimerStarted)
         {
             CurrentTime -= Time.deltaTime;
-            Debug.Log(CurrentTime);
             if (CurrentTime <= 0)
             {
                 TimerStarted = false;
