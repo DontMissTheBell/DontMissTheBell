@@ -8,7 +8,7 @@ public class Timer : MonoBehaviour
 {
     public float TimeLimit;
     private float CurrentTime;
-    private bool TimerStarted;
+    public bool TimerStarted;
     [SerializeField] TMP_Text TimerText;
 
     private void Start()
@@ -28,7 +28,7 @@ public class Timer : MonoBehaviour
                 CurrentTime = 0;
                 Debug.Log("Lose");
             }
-            TimerText.text = CurrentTime.ToString("F0");
+            TimerText.text = CurrentTime.ToString("F2");
         }
     }
 }
