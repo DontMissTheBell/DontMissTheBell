@@ -14,7 +14,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField] private int MC_Health; 
     [SerializeField] private  float MC_PlayerSpeed;
     [SerializeField] private  float MC_gravity;
-    [SerializeField] private float MC_JumpHeight;
     [SerializeField] private float MC_SprintSpeed;
     [SerializeField] private float ySpeed; // The speed the player is falling
     public Vector3 playerVelocity;
@@ -30,13 +29,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private  float dampingVelocity = 0f;
     private float targetFov;
 
-    private float jumpBuffer;
-    [SerializeField] private float jumpBufferMax = 0.25f; // The time frame that the game will store the players jump input
-    private float jumpDelay;
-
-    [SerializeField]private float dodgeDuration;
-    private bool dodging;
-    [SerializeField] private float dodgePower;
 
 
     public Transform groundCheck; // creates an input in unity we can put our epty ground check object into
@@ -48,6 +40,26 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     private RaycastHit vaultData;
 
+    [Header("Dodge")]
+    [SerializeField]private float dodgeDuration;
+    private bool dodging;
+    [SerializeField] private float dodgePower;
+
+    [Header("Jump")]
+    [SerializeField] private float MC_JumpHeight;
+    private float jumpBuffer;
+    [SerializeField] private float jumpBufferMax = 0.25f; // The time frame that the game will store the players jump input
+    private float jumpDelay;
+
+    [Header("Slide")]
+    private float slideDelay;
+    [SerializeField] private float slidePower;
+    [SerializeField] private float slideDuration;
+    private float slideTime;
+    private Vector3 slideStartPos;
+    private Vector3 slideEndPos;
+    private Vector3 slideDirection;
+
     [Header("Wall Run")]
     [SerializeField] private float wallJumpForce;
 
@@ -55,17 +67,17 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private RaycastHit rightWallData;
     private bool canWallRunRight;
     private bool canWallRunLeft;
-    private bool canWallJump;
     private bool canWallRun;
     private Vector3 wallJumpDistance;
     private float wallJumpTime;
     [SerializeField] private float wallJumpTimeMax;
     [SerializeField] private float wallRunSpeed;
-    [SerializeField] private float wallJumpBufferMax = 0.5f;
+    [SerializeField] private float wallJumpDelay;
     private float wallRunTime;
     private float extraWallRunSpeed;
     private float wallRunTilt;
     [SerializeField] private float wallRunTiltMax;
+
 
 
     
@@ -165,6 +177,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 {
                     jumpBuffer -= Time.deltaTime;
                 }
+
+                slideDelay -= Time.deltaTime;
+
                 if (controller.isGrounded)
                 {
                     ySpeed = -0.5f;
@@ -198,11 +213,19 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                         {
                             Vault();
                         }
-                        if (CheckWallRun() && canWallRun && jumpBuffer > 0)
+                        if (CheckWallRun() && canWallRun)
                         {
                             StartWallRun();
                         }
                     }
+
+                if (OnGround())
+                {
+                    if(Input.GetKey(KeyCode.F) && slideDelay <= 0)
+                    {
+                        StartSlide(transform.forward*slidePower+transform.position);
+                    }
+                }
         }
         if (mState == movementStates.WallRun)
         {
@@ -211,43 +234,77 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 {
                     EndWallRun();
                 }
-            if (!canWallJump)
+            if (wallRunTime >= wallJumpDelay)
                 {
                 if (Input.GetButton("Jump"))
-                {
-                    jumpBuffer = wallJumpBufferMax;
-                }
-                else
-                {
-                    jumpBuffer -= Time.deltaTime;
-                    if ((wallJumpBufferMax - jumpBuffer) > 0.1)
                     {
-                        canWallJump = true;
+                        WallJump();
+                        EndWallRun();
                     }
                 }
-            }
-            else
+            
+        }
+        if (mState == movementStates.Slide)
+        {
+            slideTime += Time.deltaTime;
+            float t = slideTime/slideDuration;
+            t = Mathf.Sin(t * Mathf.PI * 0.5f);
+
+            controller.Move(slideDirection * Time.deltaTime * Mathf.Lerp(slidePower,1,t));
+
+            if(slideTime >= 0.1f && Input.GetKeyUp(KeyCode.F))
             {
-                jumpBuffer -= Time.deltaTime;
-                if (Input.GetButton("Jump"))
-                {
-                    WallJump();
-                    EndWallRun();
-                }
-                if (jumpBuffer <= 0)
-                {
-                    EndWallRun();
-                }
+                EndSlide();
             }
+
+            if(slideTime >= slideDuration)
+            {
+                EndSlide();
+            }
+
         }
 
+    }
+
+    private void StartSlide(Vector3 endPos)
+    {
+        mState = movementStates.Slide;
+
+        slideDirection = playerCamera.transform.forward;
+
+        // This section ensures the direction is straight and not up or down
+        float slideMag = slideDirection.magnitude;
+        slideDirection.y = 0;
+
+        slideDirection = Vector3.Normalize(slideDirection) * slideMag;
+
+
+        controller.height = 1;
+        controller.center = new Vector3(0,-0.5f,0); 
+
+
+        slideTime = 0;
+
+        playerCamera.transform.DOMoveY(playerCamera.transform.position.y-0.5f,0.1f).SetEase(Ease.InOutSine);
+
+    }
+
+    private void EndSlide()
+    {
+        mState = movementStates.Run;
+        controller.height = 2;
+        controller.center = new Vector3(0,0,0); 
+        jumpDelay = 0.25f;
+
+        playerCamera.transform.DOMoveY(playerCamera.transform.position.y+0.5f,0.1f).SetEase(Ease.InOutSine);
+
+        slideDelay = 0.25f;
     }
 
     private void StartWallRun()
     {
         mState = movementStates.WallRun;
         ySpeed = 0;
-        canWallJump = false;
         wallRunTime = 0f;
         wallRunTilt = canWallRunRight ? wallRunTiltMax : -wallRunTiltMax;
         cameraScript.StartTiltScreen(0.25f, wallRunTilt, false);
@@ -265,7 +322,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private void EndWallRun()
     {
         mState = movementStates.Run;
-        canWallJump = false;
         canWallRun = false;
         cameraScript.StartTiltScreen(0.25f, wallRunTilt, true);
     }
@@ -349,10 +405,10 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         {
             MC_Health = MC_Health -= 1;
         }
-        else
-        {
-            MC_Health = MC_Health;         
-        }
+//        else
+//        {
+//            MC_Health = MC_Health;         // This code does nohting lol
+//        }
         return;        
     }
 
