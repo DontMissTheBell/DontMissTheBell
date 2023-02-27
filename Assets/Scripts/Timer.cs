@@ -1,25 +1,34 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Timer : MonoBehaviour
 {
     public float TimeLimit;
-    private float FinishTime;
-    // Start is called before the first frame update
-    void Start()
+    private float CurrentTime;
+    public bool TimerStarted;
+    [SerializeField] TMP_Text TimerText;
+
+    private void Start()
     {
-        FinishTime = Time.time + TimeLimit;
+        CurrentTime = TimeLimit;
+        TimerStarted = true;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        Debug.Log(Time.time);
-        if (Time.time >= FinishTime)
+        if (TimerStarted)
         {
-            //SceneManager.LoadScene("LoadScreen");
-            Debug.Log("Lose");
+            CurrentTime -= Time.deltaTime;
+            if (CurrentTime <= 0)
+            {
+                TimerStarted = false;
+                CurrentTime = 0;
+                Debug.Log("Lose");
+            }
+            TimerText.text = CurrentTime.ToString("F2");
         }
     }
 }
