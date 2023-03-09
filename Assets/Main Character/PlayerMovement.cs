@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour // used MC_ for main character variables to cause less confusion later on
 {
@@ -52,13 +53,22 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private float jumpDelay;
 
     [Header("Slide")]
-    private float slideDelay;
+    private bool isSliding;
+    private float crouchDelay;
     [SerializeField] private float slidePower;
     [SerializeField] private float slideDuration;
     private float slideTime;
     private Vector3 slideStartPos;
     private Vector3 slideEndPos;
     private Vector3 slideDirection;
+
+    [Header("Crouch")]
+    private bool isCrouching;
+    [Header("Roll")]
+    [SerializeField] private Image DamageTint;
+    private bool failRoll;
+    private float failRollTimer;
+    private float failRollDuration = 2.0f;
 
     [Header("Wall Run")]
     [SerializeField] private float wallJumpForce;
@@ -101,7 +111,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     {
         ResetScene();
 
-        if (Input.GetKey("left shift"))
+        if (Input.GetKey("left shift") && (!isCrouching || (isCrouching && isSliding)) && !failRoll)
             { // Checks if the player is holding down the sprint key
                 targetFov = defaultFov + 20;
                 isSprinting = true;
@@ -113,6 +123,17 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             }
 
         MovementState();
+
+        // If the player has failed a roll
+        if (failRoll)
+        {
+            failRollTimer += Time.deltaTime;
+            if(failRollTimer > failRollDuration)
+            {
+                failRoll = false;
+                MC_PlayerSpeed *= 2;
+            }
+        }
 
         // Smoothly changes the cameras FOV depending on if the value of the targetFov value
         playerCamera.fieldOfView = Mathf.SmoothDamp(playerCamera.fieldOfView, targetFov, ref dampingVelocity, 0.1f);
@@ -169,7 +190,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 controller.Move(velocity * Time.deltaTime); // moves our character controller we inputted by the vector3 variable multiplied by the speed we initialised then multiplied by time delta, this ensures we move at a constant speed in correlation to our fps so there is no stuttering etc
 
                 jumpDelay -= Time.deltaTime; // This code handles the jump buffering system
-                if (Input.GetButton("Jump") && jumpDelay <= 0)
+                if (Input.GetButton("Jump") && jumpDelay <= 0 && !failRoll)
                 {
                     jumpBuffer = jumpBufferMax;
                 }
@@ -178,7 +199,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                     jumpBuffer -= Time.deltaTime;
                 }
 
-                slideDelay -= Time.deltaTime;
+                crouchDelay -= Time.deltaTime;
 
                 if (controller.isGrounded)
                 {
@@ -197,12 +218,12 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                     if (Input.GetAxisRaw("Horizontal") == -1 && Input.GetMouseButtonDown(1))
                     {
                         StartCoroutine(Dodge(-transform.right*dodgePower+transform.position));
-                        StartCoroutine(cameraScript.QuickTiltScreen(dodgeDuration,10f));
+                        StartCoroutine(cameraScript.QuickTiltScreen(dodgeDuration,7.5f));
                     }
                     if (Input.GetAxisRaw("Horizontal") == 1 && Input.GetMouseButtonDown(1))
                     {
                         StartCoroutine(Dodge(transform.right*dodgePower+transform.position));
-                        StartCoroutine(cameraScript.QuickTiltScreen(dodgeDuration,-10f));
+                        StartCoroutine(cameraScript.QuickTiltScreen(dodgeDuration,-7.5f));
                     }
                 }
 
@@ -219,11 +240,22 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                         }
                     }
 
-                if (OnGround())
+                if (controller.isGrounded)//
                 {
-                    if(Input.GetKey(KeyCode.F) && slideDelay <= 0)
+                    if(Input.GetKey(KeyCode.F) && crouchDelay <= 0 && !isCrouching)
                     {
+                        if (isSprinting)
+                        {
                         StartSlide(transform.forward*slidePower+transform.position);
+                        }
+                        StartCrouch();
+                    }
+                    if(!Input.GetKey(KeyCode.F))
+                    {
+                        if(isCrouching)
+                        {
+                            EndCrouch();
+                        }
                     }
                 }
         }
@@ -252,18 +284,51 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             controller.Move(slideDirection * Time.deltaTime * Mathf.Lerp(slidePower,1,t));
 
-            if(slideTime >= 0.1f && Input.GetKeyUp(KeyCode.F))
+            if(slideTime >= 0.1f && !Input.GetKey(KeyCode.F))
             {
+                EndCrouch();
                 EndSlide();
             }
 
             if(slideTime >= slideDuration)
             {
+                if (!Input.GetKey(KeyCode.F))
+                {
+                EndCrouch();
                 EndSlide();
+                }
+                else
+                {
+                EndSlide();
+                }
             }
 
         }
 
+    }
+
+    private void StartCrouch()
+    {
+        isCrouching = true;
+
+        crouchDelay = 0.25f;
+
+        controller.height = 1;
+        controller.center = new Vector3(0,-0.5f,0); 
+
+        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y-0.5f,0.1f).SetEase(Ease.InOutSine);
+    }
+
+    private void EndCrouch()
+    {
+        isCrouching = false;
+        
+        crouchDelay = 0.25f;
+
+        controller.height = 2;
+        controller.center = new Vector3(0,0,0); 
+
+        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y+0.5f,0.1f).SetEase(Ease.InOutSine);
     }
 
     private void StartSlide(Vector3 endPos)
@@ -278,27 +343,18 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         slideDirection = Vector3.Normalize(slideDirection) * slideMag;
 
-
-        controller.height = 1;
-        controller.center = new Vector3(0,-0.5f,0); 
-
-
         slideTime = 0;
 
-        playerCamera.transform.DOMoveY(playerCamera.transform.position.y-0.5f,0.1f).SetEase(Ease.InOutSine);
+        isSliding = true;
+
 
     }
 
     private void EndSlide()
     {
         mState = movementStates.Run;
-        controller.height = 2;
-        controller.center = new Vector3(0,0,0); 
-        jumpDelay = 0.25f;
 
-        playerCamera.transform.DOMoveY(playerCamera.transform.position.y+0.5f,0.1f).SetEase(Ease.InOutSine);
-
-        slideDelay = 0.25f;
+        isSliding = false;
     }
 
     private void StartWallRun()
@@ -401,15 +457,72 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     public void OnControllerColliderHit(ControllerColliderHit MC_FallDamage)
     {
+
+        if (ySpeed <= -20f) // If the player falls from high enough to need to roll
+        {
+            if(Input.GetKey(KeyCode.F))
+            {
+                StartCoroutine(Roll());
+            }
+            else
+            {
+                FailRoll();
+            }
+        }
         if (ySpeed <= -40f)
         {
             MC_Health = MC_Health -= 1;
         }
 //        else
 //        {
-//            MC_Health = MC_Health;         // This code does nohting lol
+//            MC_Health = MC_Health;         // This code does nothing lol
 //        }
         return;        
+    }
+
+    IEnumerator Roll()
+    {
+
+        float startRotation = transform.eulerAngles.x;
+        float endRotation = startRotation + 360.0f;
+
+        float yRotation = transform.eulerAngles.y;
+        float zRotation = transform.eulerAngles.z;
+        
+        float duration = 0.5f;
+        float t = 0.0f;
+
+        cameraScript.StartRoll(duration);
+
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+
+            float xRotation = Mathf.Lerp(startRotation, endRotation, t/ duration) % 360;
+
+            transform.eulerAngles = new Vector3(xRotation, yRotation, zRotation);
+
+
+            yield return null;
+
+
+        }
+
+
+
+    }
+
+    private void FailRoll()
+    {
+        MC_PlayerSpeed /= 2;
+        DamageTint.DOFade(1,0.1f).OnComplete(()=> DamageTint.DOFade(0,failRollDuration-0.1f));
+
+        playerCamera.DOShakePosition(0.35f,1,20,45,true,randomnessMode:ShakeRandomnessMode.Harmonic);
+
+        failRoll = true;
+        failRollTimer = 0;
+
+        jumpBuffer = 0;
     }
 
 
