@@ -36,10 +36,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     public float groundDistance = 0.4f; // will be used later to make the sphere check for 0.4 towards the ground
     public LayerMask groundMask, vaultMask; // a layer mask is in unity and is just a layer you can create
 
-    private enum movementStates{Run, WallRun, Slide, Dodge}
+    private enum movementStates{Run, WallRun, Slide, Dodge, Vault}
     private movementStates mState = movementStates.Run;
 
-    private RaycastHit vaultData;
 
     [Header("Dodge")]
     [SerializeField]private float dodgeDuration;
@@ -69,6 +68,16 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private bool failRoll;
     private float failRollTimer;
     private float failRollDuration = 2.0f;
+    [Header("Grapple")]
+    private RaycastHit grapData;
+    private float grapDistance;
+    [Header("Vault")]
+    private RaycastHit vaultData;
+    private Vector3 vaultPosition;
+    private Vector3 startVaultPosition;
+    private Vector3 endVaultPosition;
+    [SerializeField] private float vaultDuration;
+    private float vaultTime;
 
     [Header("Wall Run")]
     [SerializeField] private float wallJumpForce;
@@ -227,12 +236,17 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                     }
                 }
 
+                if (Input.GetKey(KeyCode.V) && CheckVault())
+                    {
+                        Vault();
+                    }
+
 
                 if (!OnGround())
                     {
-                        if (CheckVault() && jumpBuffer > 0)
+                        if (jumpBuffer > 0 && CheckGrap())
                         {
-                            Vault();
+                            Grap();
                         }
                         if (CheckWallRun() && canWallRun)
                         {
@@ -304,7 +318,83 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             }
 
         }
+        if (mState == movementStates.Vault)
+        {
+            vaultTime += Time.deltaTime;
+            vaultPosition = Vector3.Lerp(startVaultPosition, endVaultPosition,vaultTime/vaultDuration);
 
+            float vaultY = 0.1f;
+
+            vaultPosition.y += vaultY;
+
+            transform.position = vaultPosition;
+
+
+            if(vaultTime >= vaultDuration)
+            {
+            mState = movementStates.Run;
+            }
+        }
+
+    }
+
+    private void Vault()
+    {
+        float vaultWidth = 0;
+        if(vaultData.normal.x != 0)
+        {
+            vaultWidth = ((vaultData.transform.gameObject.GetComponent<BoxCollider>().size.x * vaultData.transform.localScale.x));
+        }
+        if(vaultData.normal.z != 0)
+        {
+            vaultWidth = ((vaultData.transform.gameObject.GetComponent<BoxCollider>().size.z * vaultData.transform.localScale.z));
+        }
+        startVaultPosition = transform.position;
+        endVaultPosition = startVaultPosition + ((transform.forward) * (vaultWidth+(vaultData.distance * 2)));
+        mState = movementStates.Vault;
+
+        vaultTime = 0;
+    }
+
+    private bool CheckVault()
+    {
+        if (Physics.Raycast(groundCheck.transform.position, groundCheck.transform.TransformDirection(Vector3.forward), out vaultData, 1.5f, vaultMask.value) && !Physics.CheckSphere(groundCheck.transform.position + groundCheck.transform.forward * 6, 1, vaultMask.value))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private bool CheckGrap()
+    {
+        // Here it performs a raycast, to check if the player is infront of an object they can grapple
+        if (Physics.Raycast(groundCheck.transform.position, groundCheck.transform.TransformDirection(Vector3.forward), out grapData, 2, vaultMask.value))
+        {
+            // Here it does some math, with the output being the distance of the player from the top of the wall.
+            // This is then used to determine if the player is high enough to grapple, as well as how high they need to go in order to be moved ontop of the object
+            Vector3 grapLocation = grapData.point;
+            float grapHeight = ((grapData.transform.gameObject.GetComponent<BoxCollider>().size.y * grapData.transform.localScale.y));
+            float grapHeightWorld = (grapHeight/2) + grapData.transform.position.y;
+            GameObject grapObject = grapData.transform.gameObject;
+
+            grapDistance = grapHeightWorld - grapLocation.y;
+
+            if (grapDistance <= 2) // If the player is high enough to grapple, then return true
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void Grap()
+    {
+        jumpBuffer = 0f;
+
+        transform.position += (transform.forward*grapData.distance);
+        transform.position += new Vector3(0, grapDistance + 0.25f, 0);
+        ySpeed = -0.5f;
+        jumpDelay = 0.25f;
     }
 
     private void StartCrouch()
@@ -382,11 +472,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         cameraScript.StartTiltScreen(0.25f, wallRunTilt, true);
     }
 
-    private bool CheckVault()
-    {
-        // Here it performs a raycast, to check if the player is infront of an object they can vault
-        return Physics.Raycast(groundCheck.transform.position, groundCheck.transform.TransformDirection(Vector3.forward), out vaultData, 2, vaultMask.value);
-    }
     private bool CheckWallRun()
     {
         canWallRunLeft = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.left), out leftWallData, 2f, vaultMask.value);
@@ -433,26 +518,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         wallRunTime += Time.deltaTime;
 
         controller.Move(new Vector3(forward.x,0,forward.z)*(wallRunSpeed*extraWallRunSpeed*Time.deltaTime));//
-    }
-
-    private void Vault()
-    {
-        jumpBuffer = 0f;
-        // Here it does some math, with the output being the distance of the player from the top of the wall.
-        // This is then used to determine if the player is high enough to vault, as well as how high they need to go in order to be moved ontop of the object
-        Vector3 vaultLocation = vaultData.point;
-        float vaultHeight = ((vaultData.transform.gameObject.GetComponent<BoxCollider>().size.y * vaultData.transform.localScale.y));
-        float vaultHeightWorld = (vaultHeight/2) + vaultData.transform.position.y;
-        GameObject vaultObject = vaultData.transform.gameObject;
-        float vaultDistance = vaultHeightWorld - vaultLocation.y;
-        if (vaultDistance <= 2) // If the player is high enough to vault, then they are moved the correct distance to the top of the object
-            {
-                transform.position += (transform.forward*vaultData.distance);
-                transform.position += new Vector3(0, vaultDistance + 0.25f, 0);
-                ySpeed = -0.5f;
-                jumpDelay = 0.25f;
-            }
-            
     }
 
     public void OnControllerColliderHit(ControllerColliderHit MC_FallDamage)
