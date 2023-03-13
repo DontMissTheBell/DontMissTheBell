@@ -15,7 +15,7 @@ public class PauseMenu : MonoBehaviour
     void Update()
     {
         // If Pause button pressed
-        if (Input.GetButtonDown("Cancel")) {
+        if (Input.GetButtonDown("Cancel") && !Globals.instance.levelComplete) {
             Time.timeScale = 1.0f - Time.timeScale;
             Globals.instance.gamePaused = 0.0f == Time.timeScale;
             gameObject.GetComponentInChildren<Canvas>(includeInactive: true).enabled = 0.0f == Time.timeScale;

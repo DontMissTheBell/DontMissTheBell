@@ -19,6 +19,7 @@ public class Win : MonoBehaviour
         {
             Debug.Log("Win");
             Time.timeScale = 0.0f;
+            Globals.instance.gamePaused = true;
             Globals.instance.levelComplete = true;
             
             //output 
