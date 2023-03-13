@@ -72,7 +72,13 @@ public class GhostManager : MonoBehaviour
             replayFrame.Write(dataWriter);
         } else if (shouldReplay && !playbackBegun && ghostDownloaded)
         {
+             //if (ghostData.Read(0x00) == 0x01)
+            //{
 
+            //} else if (ghostData.Read(1) == 0x02)
+            //{
+
+            //}
         } else if (playbackBegun)
         {
 
