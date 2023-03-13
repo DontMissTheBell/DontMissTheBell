@@ -11755,6 +11755,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 682945958}
+  shouldRecord: 1
 --- !u!1 &1400735790
 GameObject:
   m_ObjectHideFlags: 0

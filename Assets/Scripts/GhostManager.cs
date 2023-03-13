@@ -1,15 +1,9 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Net;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UIElements;
 
 public class GhostManager : MonoBehaviour
 {
@@ -20,6 +14,8 @@ public class GhostManager : MonoBehaviour
     private Vector3 lastCameraRotate;
     // This is the camera object
     public Transform cameraTransform;
+    // Enable this to make the script record for this object
+    public bool shouldRecord;
 
     private void SetupRecording()
     {
@@ -42,7 +38,10 @@ public class GhostManager : MonoBehaviour
     }
     private void Awake()
     {
-        SetupRecording();
+        if (shouldRecord)
+        {
+            SetupRecording();
+        }
     }
     private void FixedUpdate()
     {
