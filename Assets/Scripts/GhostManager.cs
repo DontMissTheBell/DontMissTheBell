@@ -10,18 +10,25 @@ public class GhostManager : MonoBehaviour
     private MemoryStream ghostData;
     private MemoryStream compressedGhostData;
     private BinaryWriter dataWriter;
-    private bool currentlyRecording;
+    private bool currentlyRecording, playbackBegun, ghostDownloaded;
     private Vector3 lastCameraRotate;
     // This is the camera object
     public Transform cameraTransform;
     // Enable this to make the script record for this object
     public bool shouldRecord;
+    // Enable this to playback a ghost recording (DEBUG)
+    public bool shouldReplay;
+    public string ghostID;
 
     private void SetupRecording()
     {
         ghostData = new();
         dataWriter = new(ghostData);
         currentlyRecording = true;
+    }
+    private void SetupReplay()
+    {
+        StartCoroutine(DownloadGhost(ghostID));
     }
     private MemoryStream Compress(Stream uncompressedData)
     {
@@ -41,6 +48,9 @@ public class GhostManager : MonoBehaviour
         if (shouldRecord)
         {
             SetupRecording();
+        } else if (shouldReplay)
+        {
+            SetupReplay();
         }
     }
     private void FixedUpdate()
@@ -60,6 +70,12 @@ public class GhostManager : MonoBehaviour
                 replayFrame.CameraTransform = cameraTransform;
             }
             replayFrame.Write(dataWriter);
+        } else if (shouldReplay && !playbackBegun && ghostDownloaded)
+        {
+
+        } else if (playbackBegun)
+        {
+
         }
     }
     private void Update()
@@ -76,11 +92,11 @@ public class GhostManager : MonoBehaviour
         Debug.Log($"Final raw data size: {ghostData.Length / 1024}KB");
         compressedGhostData = Compress(ghostData);
         Debug.Log($"Final ghost size: {compressedGhostData.Length}B");
-        StartCoroutine(Upload());
+        StartCoroutine(UploadGhost(compressedGhostData.ToArray()));
     }
-    private IEnumerator Upload()
+    private IEnumerator UploadGhost(byte[] ghostData)
     {
-        UnityWebRequest www = UnityWebRequest.Put("http://localhost:8080/api/v1/submit-ghost", compressedGhostData.ToArray());
+        UnityWebRequest www = UnityWebRequest.Put("http://localhost:8080/api/v1/submit-ghost", ghostData);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
@@ -92,7 +108,22 @@ public class GhostManager : MonoBehaviour
             Debug.Log($"Upload complete! {www.downloadHandler.text}");
         }
     }
+    private IEnumerator DownloadGhost(string ghostID)
+    {
+        UnityWebRequest www = UnityWebRequest.Get($"http://localhost:8080/api/v1/get-ghost/{ghostID}");
+        yield return www.SendWebRequest();
 
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+        }
+        else
+        {
+            ghostData = new(www.downloadHandler.data);
+            ghostDownloaded = true;
+            Debug.Log($"Successfully downloaded {ghostData.Length / 1024}KB replay"); 
+        }
+    }
 }
 
 public class ReplayFrame
