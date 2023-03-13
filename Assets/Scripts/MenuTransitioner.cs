@@ -26,7 +26,7 @@ public class MenuTransitioner : MonoBehaviour
     public void StartGame()
     {
         Destroy(gameObject);
-        GameManager.LoadScene("Test", 0.5f);
+        Globals.LoadScene("Test", 0.5f);
     }
 }
 
