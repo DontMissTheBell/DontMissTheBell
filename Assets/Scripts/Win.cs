@@ -18,7 +18,8 @@ public class Win : MonoBehaviour
         if(collider.gameObject.name == "MainCharacter" && objectives.HomeworkCompleted)
         {
             Debug.Log("Win");
-            timer.TimerStarted = false;
+            Time.timeScale = 0.0f;
+            Globals.instance.levelComplete = true;
             
             //output 
         }

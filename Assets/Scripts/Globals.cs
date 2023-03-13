@@ -20,4 +20,5 @@ public class Globals : MonoBehaviour
 
     // Global variables
     public bool gamePaused;
+    public bool levelComplete;
 }

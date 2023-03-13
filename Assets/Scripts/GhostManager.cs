@@ -65,7 +65,7 @@ public class GhostManager : MonoBehaviour
     }
     private void Update()
     {
-        if (Globals.instance.gamePaused && currentlyRecording)
+        if (Globals.instance.levelComplete && currentlyRecording)
         {
             FinishRecording();
         }
@@ -150,7 +150,7 @@ public class ReplayFrame
                 Buffer.BlockCopy(cameraTransformBytes, 0, newBytes, bytes.Length - 1, cameraTransformBytes.Length);
                 bytes = newBytes;
             }
-            Debug.Log(BitConverter.ToString(bytes));
+            // Debug.Log(BitConverter.ToString(bytes));
             return bytes;
         }
     }

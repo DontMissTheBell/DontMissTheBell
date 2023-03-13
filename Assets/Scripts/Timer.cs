@@ -8,23 +8,20 @@ public class Timer : MonoBehaviour
 {
     public float TimeLimit;
     private float CurrentTime;
-    public bool TimerStarted;
     [SerializeField] TMP_Text TimerText;
 
     private void Start()
     {
         CurrentTime = TimeLimit;
-        TimerStarted = true;
     }
 
     private void Update()
     {
-        if (TimerStarted)
+        if (!Globals.instance.levelComplete && CurrentTime != 0)
         {
             CurrentTime -= Time.deltaTime;
             if (CurrentTime <= 0)
             {
-                TimerStarted = false;
                 CurrentTime = 0;
                 Debug.Log("Lose");
             }
