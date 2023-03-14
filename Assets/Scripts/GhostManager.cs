@@ -3,11 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.XR;
 
 public class GhostManager : MonoBehaviour
 {
+    private const int CURRENT_VER = 2;
+    private const int MINIMUM_VER = 2;
     private MemoryStream ghostData;
     private MemoryStream compressedGhostData;
     private BinaryWriter dataWriter;
@@ -15,7 +19,7 @@ public class GhostManager : MonoBehaviour
     private ReplayFrame[] replayFrames;
     private Vector3 lastCameraRotation;
     private Quaternion idealCameraRotation;
-    private Int32 replayLength, currentFrameIndex = 0;
+    private uint replayLength, currentFrameIndex = 0;
     // This is the camera object
     public Transform cameraTransform;
     // Enable this to make the script record for this object
@@ -85,8 +89,16 @@ public class GhostManager : MonoBehaviour
         }
         else if (shouldReplay && !playbackBegun && ghostDownloaded)
         {
-            replayFrames = DecodeGhostData();
-            playbackBegun = true;
+            try
+            {
+                replayFrames = DecodeGhostData();
+                playbackBegun = true;
+            }
+            catch (InvalidDataException e)
+            {
+                Debug.Log($"Replay data incompatible or corrupt: {e.Message}");
+                shouldReplay = false;
+            }
         }
         else if (playbackBegun && currentFrameIndex + 1 != replayLength) // Stop when we reach the end of the replay
         {
@@ -116,14 +128,36 @@ public class GhostManager : MonoBehaviour
     private ReplayFrame[] DecodeGhostData()
     {
         int totalSize = 0;
+        byte[] buffer;
         List<ReplayFrame> frames = new();
 
-        ghostData.Seek(-sizeof(Int32), SeekOrigin.End);
-        byte[] replayLengthBytes = new byte[sizeof(Int32)];
-        ghostData.Read(replayLengthBytes, 0, sizeof(Int32));
-        replayLength = BitConverter.ToInt32(replayLengthBytes, 0);
-        //Debug.Log($"Replay length: {replayLength}");
+        // Get size of footer (last int)
+        buffer = new byte[sizeof(int)];
+        ghostData.Seek(-sizeof(int), SeekOrigin.End);
+        ghostData.Read(buffer, 0, sizeof(int));
 
+        // Seek to footer beginning
+        ghostData.Seek(-BitConverter.ToInt32(buffer, 0), SeekOrigin.End);
+
+        // Check footer begins with 0xFF marker
+        if (ghostData.ReadByte() != 0xFF)
+        {
+            throw new InvalidDataException("Footer does not start with expected byte");
+        }
+
+        // Get replay length from footer (position 2)
+        ghostData.Read(buffer, 0, sizeof(uint));
+        replayLength = BitConverter.ToUInt32(buffer, 0);
+
+        // Check version is in compatible range
+        ghostData.Read(buffer, 0, sizeof(int));
+        uint dataVersion = BitConverter.ToUInt32(buffer, 0);
+        if (!(MINIMUM_VER <= dataVersion && dataVersion <= CURRENT_VER))
+        {
+            throw new InvalidDataException("Version is not supported by this build of the game");
+        }
+
+        // Reset position
         ghostData.Seek(0, SeekOrigin.Begin);
 
         for (int frameIndex = 0; frameIndex < replayLength; frameIndex++)
@@ -155,7 +189,21 @@ public class GhostManager : MonoBehaviour
     public void FinishRecording()
     {
         currentlyRecording = false;
+
+        // Store original length
+        uint origDataSize = (uint)ghostData.Length;
+        // Start marker (1 byte)
+        dataWriter.Write((byte)0xFF);
+        // Number of frames recorded (int32, 4 bytes)
         dataWriter.Write(replayLength);
+        // Version code (int32, 4 bytes)
+        dataWriter.Write(CURRENT_VER);
+        // Reserved space (target 64 byte footer total)
+        dataWriter.Write(new byte[48]);
+        // Footer size (int32, 4 bytes)
+        uint footerSize = (uint)ghostData.Length - origDataSize + sizeof(uint);
+        dataWriter.Write(footerSize);
+
         Debug.Log($"Final raw data size: {ghostData.Length / 1024}KB");
         compressedGhostData = Compress(ghostData);
         Debug.Log($"Final ghost size: {compressedGhostData.Length / 1024}KB");
@@ -279,11 +327,15 @@ public class ReplayFrame
             {
                 hasTransform = true;
 
+                // Create arrays to fill with split data
                 byte[] positionBytes = new byte[POSITION_SIZE];
                 byte[] rotationBytes = new byte[ROTATION_SIZE];
+
+                // Copy position and rotation into respective arrays
                 Buffer.BlockCopy(value, 1, positionBytes, 0, POSITION_SIZE);
                 Buffer.BlockCopy(value, 1 + POSITION_SIZE, rotationBytes, 0, ROTATION_SIZE);
 
+                // Unpack to Vector3s
                 position.x = BitConverter.ToSingle(positionBytes, 0 * sizeof(float));
                 position.y = BitConverter.ToSingle(positionBytes, 1 * sizeof(float));
                 position.z = BitConverter.ToSingle(positionBytes, 2 * sizeof(float));
@@ -292,17 +344,20 @@ public class ReplayFrame
                 eulerAngles.y = BitConverter.ToSingle(rotationBytes, 1 * sizeof(float));
                 eulerAngles.z = BitConverter.ToSingle(rotationBytes, 2 * sizeof(float));
 
+                // If there is camera data after the player transform
                 if (value[POSITION_SIZE + ROTATION_SIZE] == 0x01)
                 {
                     hasCameraTransform = true;
                     Buffer.BlockCopy(value, 2 + POSITION_SIZE + ROTATION_SIZE, cameraEulerAnglesBytes, 0, CAMERA_SIZE);
                 };
             }
+            // If there is only camera data (no player transform)
             else if (value[1] == 0x01)
             {
                 hasCameraTransform = true;
                 Buffer.BlockCopy(value, 2, cameraEulerAnglesBytes, 0, CAMERA_SIZE);
             }
+            // Unpack to Vector3
             if (hasCameraTransform)
             {
                 cameraRotation.x = BitConverter.ToSingle(cameraEulerAnglesBytes, 0 * sizeof(float));
