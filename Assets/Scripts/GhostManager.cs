@@ -3,10 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.XR;
 
 public class GhostManager : MonoBehaviour
 {
@@ -17,7 +15,7 @@ public class GhostManager : MonoBehaviour
     private BinaryWriter dataWriter;
     private bool currentlyRecording, playbackBegun, ghostDownloaded;
     private ReplayFrame[] replayFrames;
-    private Vector3 lastCameraRotation;
+    private Quaternion lastCameraRotation;
     private Quaternion idealCameraRotation;
     private uint replayLength, currentFrameIndex = 0;
     // This is the camera object
@@ -79,10 +77,11 @@ public class GhostManager : MonoBehaviour
                 replayFrame.Transform = transform;
             }
             // hasChanged isn't working, probably becaue its a child object
-            if (cameraTransform.localEulerAngles != lastCameraRotation)
+            if (cameraTransform.localRotation != lastCameraRotation)
             {
-                lastCameraRotation = cameraTransform.localEulerAngles;
+                lastCameraRotation = cameraTransform.localRotation;
                 replayFrame.CameraTransform = cameraTransform;
+                //Debug.Log(cameraTransform.localRotation);
             }
             replayFrame.Write(dataWriter);
             replayLength++;
@@ -108,6 +107,7 @@ public class GhostManager : MonoBehaviour
             if (replayFrames[currentFrameIndex].hasCameraTransform)
             {
                 idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
+                //Debug.Log(idealCameraRotation);
             }
 
             // We need to move on to the next frame's data
@@ -120,9 +120,9 @@ public class GhostManager : MonoBehaviour
         {
             FinishRecording();
         }
-        if (cameraTransform.localRotation != idealCameraRotation)
+        if (cameraTransform.localRotation != idealCameraRotation && (playbackBegun && currentFrameIndex + 1 != replayLength))
         {
-            cameraTransform.localRotation = Quaternion.LerpUnclamped(cameraTransform.localRotation, idealCameraRotation, Time.deltaTime * 2);
+            cameraTransform.rotation = Quaternion.LerpUnclamped(cameraTransform.rotation, idealCameraRotation, Time.deltaTime * 10);
         }
     }
     private ReplayFrame[] DecodeGhostData()
@@ -266,7 +266,7 @@ public class ReplayFrame
     {
         set
         {
-            cameraRotation = value.localEulerAngles;
+            cameraRotation = value.eulerAngles;
             hasCameraTransform = true;
         }
     }
@@ -345,7 +345,8 @@ public class ReplayFrame
                 eulerAngles.z = BitConverter.ToSingle(rotationBytes, 2 * sizeof(float));
 
                 // If there is camera data after the player transform
-                if (value[POSITION_SIZE + ROTATION_SIZE] == 0x01)
+                //Debug.Log(value[POSITION_SIZE + ROTATION_SIZE + 1]);
+                if (value[POSITION_SIZE + ROTATION_SIZE + 1] == 0x01)
                 {
                     hasCameraTransform = true;
                     Buffer.BlockCopy(value, 2 + POSITION_SIZE + ROTATION_SIZE, cameraEulerAnglesBytes, 0, CAMERA_SIZE);
