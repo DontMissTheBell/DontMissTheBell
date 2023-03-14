@@ -17313,7 +17313,7 @@ MonoBehaviour:
   cameraTransform: {fileID: 841594552}
   shouldRecord: 0
   shouldReplay: 1
-  ghostID: c22ef5b5-6a36-466f-b8fc-1a87076e5b18
+  ghostID: 989deb9e-85c9-472b-95da-be2cfc83cfc8
 --- !u!114 &1537819114
 MonoBehaviour:
   m_ObjectHideFlags: 0
