@@ -17313,7 +17313,7 @@ MonoBehaviour:
   cameraTransform: {fileID: 841594552}
   shouldRecord: 0
   shouldReplay: 1
-  ghostID: 6c3e443a-37e0-4393-9bd5-7b1cb82dfa5a
+  ghostID: 2cb8f6bc-d581-4ed8-bf09-245529ac1eaf
 --- !u!114 &1537819114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17373,7 +17373,7 @@ CharacterController:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Height: 2
   m_Radius: 0.5
