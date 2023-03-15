@@ -78,6 +78,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private Vector3 endVaultPosition;
     [SerializeField] private float vaultDuration;
     private float vaultTime;
+    [SerializeField] private AnimationCurve vaultCurve;
 
     [Header("Wall Run")]
     [SerializeField] private float wallJumpForce;
@@ -323,9 +324,11 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             vaultTime += Time.deltaTime;
             vaultPosition = Vector3.Lerp(startVaultPosition, endVaultPosition,vaultTime/vaultDuration);
 
-            float vaultY = 0.1f;
+            float vaultY =  Mathf.Lerp(0, 2.0f, vaultCurve.Evaluate((vaultTime/vaultDuration)*2));
 
             vaultPosition.y += vaultY;
+
+            print(vaultY);
 
             transform.position = vaultPosition;
 

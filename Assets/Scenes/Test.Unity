@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1445600794}
-  m_IndirectSpecularColor: {r: 0.4465829, g: 0.49641728, b: 0.57482105, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465822, g: 0.4964162, b: 0.57482, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -11975,7 +11975,40 @@ MonoBehaviour:
   slidePower: 30
   slideDuration: 1.5
   DamageTint: {fileID: 603294616}
-  vaultDuration: 0.25
+  vaultDuration: 0.4
+  vaultCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.333
+      value: 0.75
+      inSlope: 1.3949913
+      outSlope: 1.3949913
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 0
+    m_RotationOrder: 4
   wallJumpForce: 20
   wallJumpTimeMax: 0.5
   wallRunSpeed: 15
@@ -17351,6 +17384,12 @@ MonoBehaviour:
   slideDuration: 1.5
   DamageTint: {fileID: 603294616}
   vaultDuration: 0.25
+  vaultCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   wallJumpForce: 20
   wallJumpTimeMax: 0.5
   wallRunSpeed: 15
