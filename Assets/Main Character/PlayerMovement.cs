@@ -2,7 +2,6 @@ using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour // used MC_ for main character variables to cause less confusion later on
@@ -12,17 +11,13 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     [SerializeField] private Camera playerCamera;
 
-    [FormerlySerializedAs("MC_Health")] [SerializeField]
-    private int mcHealth;
+    [SerializeField] private int mcHealth;
 
-    [FormerlySerializedAs("MC_PlayerSpeed")] [SerializeField]
-    private float mcPlayerSpeed;
+    [SerializeField] private float mcPlayerSpeed;
 
-    [FormerlySerializedAs("MC_gravity")] [SerializeField]
-    private float mcGravity;
+    [SerializeField] private float mcGravity;
 
-    [FormerlySerializedAs("MC_SprintSpeed")] [SerializeField]
-    private float mcSprintSpeed;
+    [SerializeField] private float mcSprintSpeed;
 
     [SerializeField] private float ySpeed; // The speed the player is falling
     public Vector3 playerVelocity;
@@ -41,8 +36,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     [SerializeField] private float dodgePower;
 
-    [FormerlySerializedAs("MC_JumpHeight")] [Header("Jump")] [SerializeField]
-    private float mcJumpHeight;
+    [Header("Jump")] [SerializeField] private float mcJumpHeight;
 
     [SerializeField]
     private float jumpBufferMax = 0.25f; // The time frame that the game will store the players jump input
@@ -50,8 +44,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField] private float slidePower;
     [SerializeField] private float slideDuration;
 
-    [FormerlySerializedAs("DamageTint")] [Header("Roll")] [SerializeField]
-    private Image damageTint;
+    [Header("Roll")] [SerializeField] private Image damageTint;
 
     [SerializeField] private float vaultDuration;
     [SerializeField] private AnimationCurve vaultCurve;

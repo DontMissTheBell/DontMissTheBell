@@ -2,22 +2,17 @@ using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 public class Globals : MonoBehaviour
 {
     // Transition variables
-    [FormerlySerializedAs("TransitionTop")] [SerializeField]
-    private RectTransform transitionTop;
+    [SerializeField] private RectTransform transitionTop;
 
-    [FormerlySerializedAs("TransitionBottom")] [SerializeField]
-    private RectTransform transitionBottom;
+    [SerializeField] private RectTransform transitionBottom;
 
-    [FormerlySerializedAs("LoadingTop")] [SerializeField]
-    private RectTransform loadingTop;
+    [SerializeField] private RectTransform loadingTop;
 
-    [FormerlySerializedAs("LoadingBottom")] [SerializeField]
-    private RectTransform loadingBottom;
+    [SerializeField] private RectTransform loadingBottom;
 
     // Global variables
     public bool gamePaused;
