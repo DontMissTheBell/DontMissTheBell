@@ -36,6 +36,5 @@ public class Globals : MonoBehaviour
         SceneManager.LoadScene(sceneName);
         yield return new WaitForSeconds(0.25f);
         loadingScreen.DORotate(Vector3.left * 90, LoadDuration);
-        yield return new WaitForSeconds(LoadDuration);
     }
 }
