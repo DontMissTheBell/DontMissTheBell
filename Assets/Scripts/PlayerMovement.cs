@@ -1,7 +1,8 @@
-using System.Collections;
 using DG.Tweening;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour // used MC_ for main character variables to cause less confusion later on
@@ -11,16 +12,15 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     [SerializeField] private Camera playerCamera;
 
-    [SerializeField] private int mcHealth;
+    [SerializeField] private int health;
 
-    [SerializeField] private float mcPlayerSpeed;
+    [SerializeField] private float walkSpeed;
 
-    [SerializeField] private float mcGravity;
+    [SerializeField] private float sprintSpeed;
 
-    [SerializeField] private float mcSprintSpeed;
+    [SerializeField] private float gravity;
 
     [SerializeField] private float ySpeed; // The speed the player is falling
-    public Vector3 playerVelocity;
 
 
     [SerializeField] // The particle objects attached to the camera
@@ -32,11 +32,11 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     public LayerMask groundMask, vaultMask; // a layer mask is in unity and is just a layer you can create
 
 
-    [Header("Dodge")] [SerializeField] private float dodgeDuration;
+    [Header("Dodge")][SerializeField] private float dodgeDuration;
 
     [SerializeField] private float dodgePower;
 
-    [Header("Jump")] [SerializeField] private float mcJumpHeight;
+    [Header("Jump")][SerializeField] private float mcJumpHeight;
 
     [SerializeField]
     private float jumpBufferMax = 0.25f; // The time frame that the game will store the players jump input
@@ -44,12 +44,12 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField] private float slidePower;
     [SerializeField] private float slideDuration;
 
-    [Header("Roll")] [SerializeField] private Image damageTint;
+    [Header("Roll")][SerializeField] private Image damageTint;
 
     [SerializeField] private float vaultDuration;
     [SerializeField] private AnimationCurve vaultCurve;
 
-    [Header("Wall Run")] [SerializeField] private float wallJumpForce;
+    [Header("Wall Run")][SerializeField] private float wallJumpForce;
 
     [SerializeField] private float wallJumpTimeMax;
     [SerializeField] private float wallRunSpeed;
@@ -69,6 +69,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private float extraWallRunSpeed;
     private bool failRoll;
     private float failRollTimer;
+    private bool hasDied;
 
     [Header("Grapple")] private RaycastHit grapData;
 
@@ -118,11 +119,16 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         cameraScript = playerCamera.GetComponent<MouseLookMainCharacter>();
     }
 
-
-    private void
-        Update() // used a normal update for things that use a character controller as fixed update is mainly for built in physics whereas normal update i created my own gravity etc so this just smoothes things out slightly
+    // used a normal update for things that use a character controller as fixed update is mainly for built in physics
+    // whereas normal update i created my own gravity etc so this just smoothes things out slightly
+    private void  Update()
     {
-        ResetScene();
+        // If we are at 0 health, die (reload level)
+        if (health <= 0 && !hasDied)
+        {
+            hasDied = true;
+            Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen(SceneManager.GetActiveScene().name));
+        }
 
         if (Input.GetKey("left shift") && (!isCrouching || (isCrouching && isSliding)) && !failRoll)
         {
@@ -145,7 +151,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             if (failRollTimer > failRollDuration)
             {
                 failRoll = false;
-                mcPlayerSpeed *= 2;
+                walkSpeed *= 2;
             }
         }
 
@@ -163,17 +169,16 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 FailRoll();
         }
 
-        if (ySpeed <= -40f) mcHealth = mcHealth -= 1;
+        if (ySpeed <= -40f) health = health -= 1;
         //        else
-//        {
-//            MC_Health = MC_Health;         // This code does nothing lol
-//        }
+        //        {
+        //            MC_Health = MC_Health;         // This code does nothing lol
+        //        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag ==
-            "Powerup") // This will trigger if the player goes inside the hitbox of a powerup object
+        if (other.gameObject.CompareTag("Powerup")) // This will trigger if the player goes inside the hitbox of a powerup object
         {
             var otherScript = other.GetComponent<Powerup>();
             otherScript.particles.Play();
@@ -189,12 +194,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             Destroy(otherScript.particles.gameObject, 1f);
             StartCoroutine(Powerup_Effect());
         }
-    }
-
-    public void ResetScene()
-    {
-        if (mcHealth <= 0) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        //Debug.Log("Health is: " + MC_Health);
     }
 
     private void MovementState()
@@ -214,18 +213,18 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                        z; // creates a Vector3 which is a variable called move with 3 presets of coordinates for us already, so we transform the right by x variable and forward by z variable these are on the same line so we can move in either direction at the same time
             //transform.right and transform.forward are things unity already recognises this also makes sure that if we move forward but look right we will move where our camera is 
 
-            if (isSprinting) move *= mcSprintSpeed;
+            if (isSprinting) move *= sprintSpeed;
 
             var magnitude =
                 Mathf.Clamp01(move.magnitude) *
-                mcPlayerSpeed; // Clamps the magnitude of the move vector so that u dont go faster diagonally, also times by movement speed
+                walkSpeed; // Clamps the magnitude of the move vector so that u dont go faster diagonally, also times by movement speed
 
-            var velocity = move * mcPlayerSpeed;
+            var velocity = move * walkSpeed;
 
             velocity.y = ySpeed;
 
             // This code handles the gravity of the player
-            ySpeed += mcGravity * Time.deltaTime;
+            ySpeed += gravity * Time.deltaTime;
 
 
             // If the player has walljumped
@@ -552,7 +551,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     private void FailRoll()
     {
-        mcPlayerSpeed /= 2;
+        walkSpeed /= 2;
         damageTint.DOFade(1, 0.1f).OnComplete(() => damageTint.DOFade(0, failRollDuration - 0.1f));
 
         playerCamera.DOShakePosition(0.35f, 1, 20, 45, randomnessMode: ShakeRandomnessMode.Harmonic);
@@ -603,9 +602,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     private IEnumerator Powerup_SpeedBoost() // Doubles the players speed for 5 seconds
     {
-        mcPlayerSpeed *= 2;
+        walkSpeed *= 2;
         yield return new WaitForSeconds(5);
-        mcPlayerSpeed /= 2;
+        walkSpeed /= 2;
     }
 
     private IEnumerator Powerup_JumpBoost() // Increases the players jump height for 5 seconds

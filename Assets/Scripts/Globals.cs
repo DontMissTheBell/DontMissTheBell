@@ -5,14 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class Globals : MonoBehaviour
 {
-    // Transition variables
-    [SerializeField] private RectTransform transitionTop;
-
-    [SerializeField] private RectTransform transitionBottom;
-
-    [SerializeField] private RectTransform loadingTop;
-
-    [SerializeField] private RectTransform loadingBottom;
+    // Loading screen
+    private RectTransform loadingScreen;
+    private const float LoadDuration = 1.0f;
 
     // Global variables
     public bool gamePaused;
@@ -27,27 +22,20 @@ public class Globals : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        loadingScreen = GameObject.FindGameObjectWithTag("LoadingScreen").GetComponent<RectTransform>();
+
         gamePaused = 0.0f == Time.timeScale;
     }
 
     // Transition manager
-    private IEnumerator ScreenTransition(string sceneName, float duration)
+    public IEnumerator TriggerLoadingScreen(string sceneName)
     {
-        transitionBottom.DOAnchorPosY(transitionBottom.anchoredPosition.y + 545, duration).SetEase(Ease.InOutExpo);
-        transitionTop.DOAnchorPosY(transitionTop.anchoredPosition.y + -545, duration).SetEase(Ease.InOutExpo);
-        loadingTop.DOAnchorPosY(loadingTop.anchoredPosition.y + 545, duration).SetEase(Ease.InOutExpo);
-        loadingBottom.DOAnchorPosY(loadingBottom.anchoredPosition.y - 545, duration).SetEase(Ease.InOutExpo);
-        yield return new WaitForSeconds(duration);
+        loadingScreen.DORotate(Vector3.zero, LoadDuration);
+        yield return new WaitForSeconds(LoadDuration);
+        DOTween.KillAll();
         SceneManager.LoadScene(sceneName);
         yield return new WaitForSeconds(0.25f);
-        transitionBottom.DOAnchorPosY(transitionBottom.anchoredPosition.y + -545, duration).SetEase(Ease.InOutExpo);
-        transitionTop.DOAnchorPosY(transitionTop.anchoredPosition.y + 545, duration).SetEase(Ease.InOutExpo);
-        loadingTop.DOAnchorPosY(loadingTop.anchoredPosition.y - 545, duration).SetEase(Ease.InOutExpo);
-        loadingBottom.DOAnchorPosY(loadingBottom.anchoredPosition.y + 545, duration).SetEase(Ease.InOutExpo);
-    }
-
-    public static void LoadScene(string sceneName, float duration)
-    {
-        Instance.StartCoroutine(Instance.ScreenTransition(sceneName, duration));
+        loadingScreen.DORotate(Vector3.left * 90, LoadDuration);
+        yield return new WaitForSeconds(LoadDuration);
     }
 }
