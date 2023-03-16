@@ -18,7 +18,7 @@ public class Timer : MonoBehaviour
 
     private void Update()
     {
-        if (!Globals.instance.levelComplete && currentTime != 0)
+        if (!Globals.Instance.levelComplete && currentTime != 0)
         {
             currentTime -= Time.deltaTime;
             if (currentTime <= 0)

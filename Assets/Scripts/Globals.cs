@@ -23,13 +23,13 @@ public class Globals : MonoBehaviour
     public bool gamePaused;
     public bool levelComplete;
 
-    public static Globals instance { get; private set; }
+    public static Globals Instance { get; private set; }
 
     // Avoid duplication
     private void Awake()
     {
-        if (instance != null && instance != this) Destroy(gameObject);
-        instance = this;
+        if (Instance != null && Instance != this) Destroy(gameObject);
+        Instance = this;
         DontDestroyOnLoad(gameObject);
 
         gamePaused = 0.0f == Time.timeScale;
@@ -53,6 +53,6 @@ public class Globals : MonoBehaviour
 
     public static void LoadScene(string sceneName, float duration)
     {
-        instance.StartCoroutine(instance.ScreenTransition(sceneName, duration));
+        Instance.StartCoroutine(Instance.ScreenTransition(sceneName, duration));
     }
 }

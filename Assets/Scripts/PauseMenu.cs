@@ -11,10 +11,10 @@ public class PauseMenu : MonoBehaviour
     private void Update()
     {
         // If Pause button pressed
-        if (Input.GetButtonDown("Cancel") && !Globals.instance.levelComplete)
+        if (Input.GetButtonDown("Cancel") && !Globals.Instance.levelComplete)
         {
             Time.timeScale = 1.0f - Time.timeScale;
-            Globals.instance.gamePaused = 0.0f == Time.timeScale;
+            Globals.Instance.gamePaused = 0.0f == Time.timeScale;
             gameObject.GetComponentInChildren<Canvas>(true).enabled = 0.0f == Time.timeScale;
             if (Time.timeScale == 1.0f)
                 Cursor.lockState = CursorLockMode.Locked;
