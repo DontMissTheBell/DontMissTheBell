@@ -1,31 +1,33 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Timer : MonoBehaviour
 {
-    public float TimeLimit;
-    private float CurrentTime;
-    [SerializeField] TMP_Text TimerText;
+    [FormerlySerializedAs("TimeLimit")] public float timeLimit;
+
+    [FormerlySerializedAs("TimerText")] [SerializeField]
+    private TMP_Text timerText;
+
+    private float currentTime;
 
     private void Start()
     {
-        CurrentTime = TimeLimit;
+        currentTime = timeLimit;
     }
 
     private void Update()
     {
-        if (!Globals.instance.levelComplete && CurrentTime != 0)
+        if (!Globals.instance.levelComplete && currentTime != 0)
         {
-            CurrentTime -= Time.deltaTime;
-            if (CurrentTime <= 0)
+            currentTime -= Time.deltaTime;
+            if (currentTime <= 0)
             {
-                CurrentTime = 0;
+                currentTime = 0;
                 Debug.Log("Lose");
             }
-            TimerText.text = CurrentTime.ToString("F2");
+
+            timerText.text = currentTime.ToString("F2");
         }
     }
 }

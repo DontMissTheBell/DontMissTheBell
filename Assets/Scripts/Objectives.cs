@@ -1,17 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Objectives : MonoBehaviour
 {
-    public bool HomeworkCompleted;
+    [FormerlySerializedAs("HomeworkCompleted")]
+    public bool homeworkCompleted;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.name == "MainCharacter")
         {
-            HomeworkCompleted = true;
+            homeworkCompleted = true;
             Debug.Log("Homework Obtained");
         }
     }
