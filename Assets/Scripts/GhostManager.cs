@@ -27,7 +27,6 @@ public class GhostManager : MonoBehaviour
     private BinaryWriter dataWriter;
     private MemoryStream ghostData;
     private Quaternion idealCameraRotation;
-    private Quaternion lastCameraRotation;
     private ReplayFrame[] replayFrames;
     private uint replayLength, currentFrameIndex;
 
@@ -41,7 +40,7 @@ public class GhostManager : MonoBehaviour
 
     private void Update()
     {
-        if (Globals.instance.levelComplete && currentlyRecording) FinishRecording();
+        if (Globals.Instance.levelComplete && currentlyRecording) FinishRecording();
         if (cameraTransform.localRotation != idealCameraRotation && playbackBegun &&
             currentFrameIndex + 1 != replayLength)
             cameraTransform.rotation =
@@ -52,19 +51,21 @@ public class GhostManager : MonoBehaviour
     {
         if (currentlyRecording)
         {
+            // Create a new frame of the replay
             ReplayFrame replayFrame = new();
+
+            // Save new player transform data into frame if it has changed
             if (transform.hasChanged)
             {
                 transform.hasChanged = false;
                 replayFrame.Transform = transform;
             }
 
-            // hasChanged isn't working, probably becaue its a child object
-            if (cameraTransform.localRotation != lastCameraRotation)
+            // Save new camera transform data into frame if it has changed
+            if (cameraTransform.hasChanged)
             {
-                lastCameraRotation = cameraTransform.localRotation;
+                cameraTransform.hasChanged = false;
                 replayFrame.CameraTransform = cameraTransform;
-                //Debug.Log(cameraTransform.localRotation);
             }
 
             replayFrame.Write(dataWriter);
@@ -105,10 +106,10 @@ public class GhostManager : MonoBehaviour
 
     private void SetupReplay()
     {
-        StartCoroutine(DownloadGhost(ghostID));
+        StartCoroutine(DownloadGhost());
     }
 
-    private MemoryStream Compress(Stream uncompressedData)
+    private static MemoryStream Compress(Stream uncompressedData)
     {
         MemoryStream compressedData = new();
         uncompressedData.Seek(0, SeekOrigin.Begin);
@@ -120,22 +121,21 @@ public class GhostManager : MonoBehaviour
         return compressedData;
     }
 
-    private MemoryStream Decompress(MemoryStream compressedData)
+    private static MemoryStream Decompress(Stream compressedData)
     {
         MemoryStream uncompressedData = new();
-        using GZipStream decompressor = new(compressedData, CompressionMode.Decompress, true);
-        decompressor.CopyTo(uncompressedData);
+        using GZipStream decompress = new(compressedData, CompressionMode.Decompress, true);
+        decompress.CopyTo(uncompressedData);
         return uncompressedData;
     }
 
     private ReplayFrame[] DecodeGhostData()
     {
         var totalSize = 0;
-        byte[] buffer;
         List<ReplayFrame> frames = new();
 
         // Get size of footer (last int)
-        buffer = new byte[sizeof(int)];
+        var buffer = new byte[sizeof(int)];
         ghostData.Seek(-sizeof(int), SeekOrigin.End);
         ghostData.Read(buffer, 0, sizeof(int));
 
@@ -152,7 +152,7 @@ public class GhostManager : MonoBehaviour
         // Check version is in compatible range
         ghostData.Read(buffer, 0, sizeof(int));
         var dataVersion = BitConverter.ToUInt32(buffer, 0);
-        if (!(MinimumVer <= dataVersion && dataVersion <= CurrentVer))
+        if (dataVersion is not (>= MinimumVer and <= CurrentVer))
             throw new InvalidDataException("Version is not supported by this build of the game");
 
         // Reset position
@@ -183,7 +183,7 @@ public class GhostManager : MonoBehaviour
         return frames.ToArray();
     }
 
-    public void FinishRecording()
+    private void FinishRecording()
     {
         currentlyRecording = false;
 
@@ -207,18 +207,17 @@ public class GhostManager : MonoBehaviour
         StartCoroutine(UploadGhost(compressedGhostData.ToArray()));
     }
 
-    private IEnumerator UploadGhost(byte[] ghostData)
+    private static IEnumerator UploadGhost(byte[] ghostData)
     {
         var www = UnityWebRequest.Put("https://dmtb.catpowered.net/api/v1/submit-ghost", ghostData);
         yield return www.SendWebRequest();
 
-        if (www.result != UnityWebRequest.Result.Success)
-            Debug.Log(www.error);
-        else
-            Debug.Log($"Upload complete! {www.downloadHandler.text}");
+        Debug.Log(www.result != UnityWebRequest.Result.Success
+            ? www.error
+            : $"Upload complete! {www.downloadHandler.text}");
     }
 
-    private IEnumerator DownloadGhost(string ghostID)
+    private IEnumerator DownloadGhost()
     {
         var www = UnityWebRequest.Get($"https://dmtb.catpowered.net/api/v1/get-ghost/{ghostID}");
         yield return www.SendWebRequest();
@@ -243,11 +242,12 @@ public class ReplayFrame
     public const int RotationSize = 3 * sizeof(float);
     public const int CameraSize = 3 * sizeof(float);
     public Vector3 cameraRotation;
-    public bool hasTransform, hasCameraTransform;
+    public bool hasCameraTransform;
+    private bool hasTransform;
 
     private Vector3 position, eulerAngles;
 
-    // Class initialiser, optional parameter is transform and camera transform
+    // Class initializer, optional parameter is transform and camera transform
     public ReplayFrame(Transform tr = null, Transform cameraTr = null, byte[] byteArray = null)
     {
         if (byteArray != null) AsByteArray = byteArray;
@@ -277,7 +277,7 @@ public class ReplayFrame
         }
     }
 
-    public byte[] AsByteArray
+    private byte[] AsByteArray
     {
         get
         {
@@ -310,7 +310,7 @@ public class ReplayFrame
                 bytes = newBytes;
             }
 
-            if (hasCameraTransform)
+            if (!hasCameraTransform) return bytes;
             {
                 // Create byte array of correct size to convert floats into
                 var cameraRotationBytes = new byte[1 + CameraSize];
@@ -369,8 +369,6 @@ public class ReplayFrame
                     hasCameraTransform = true;
                     Buffer.BlockCopy(value, 2 + PositionSize + RotationSize, cameraEulerAnglesBytes, 0, CameraSize);
                 }
-
-                ;
             }
             // If there is only camera data (no player transform)
             else if (value[1] == 0x01)
@@ -380,27 +378,22 @@ public class ReplayFrame
             }
 
             // Unpack to Vector3
-            if (hasCameraTransform)
-            {
-                cameraRotation.x = BitConverter.ToSingle(cameraEulerAnglesBytes, 0 * sizeof(float));
-                cameraRotation.y = BitConverter.ToSingle(cameraEulerAnglesBytes, 1 * sizeof(float));
-                cameraRotation.z = BitConverter.ToSingle(cameraEulerAnglesBytes, 2 * sizeof(float));
-            }
+            if (!hasCameraTransform) return;
+            cameraRotation.x = BitConverter.ToSingle(cameraEulerAnglesBytes, 0 * sizeof(float));
+            cameraRotation.y = BitConverter.ToSingle(cameraEulerAnglesBytes, 1 * sizeof(float));
+            cameraRotation.z = BitConverter.ToSingle(cameraEulerAnglesBytes, 2 * sizeof(float));
             // Logs frame in hexadecimal
             // Debug.Log(BitConverter.ToString(value));
         }
     }
 
     // Exports stored transform data into given structure
-    public Transform ExportTransform(Transform tr)
+    public void ExportTransform(Transform tr)
     {
-        if (hasTransform)
-        {
-            tr.position = position;
-            tr.eulerAngles = eulerAngles;
-        }
-
-        return tr;
+        // Do nothing if we don't have transform stored in this frame
+        if (!hasTransform) return;
+        tr.position = position;
+        tr.eulerAngles = eulerAngles;
     }
 
     // Writes data into stream using given BinaryWriter
