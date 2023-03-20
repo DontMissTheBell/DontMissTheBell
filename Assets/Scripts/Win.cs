@@ -16,7 +16,6 @@ public class Win : MonoBehaviour
         if (collider.gameObject.name == "MainCharacter" && objectives.homeworkCompleted)
         {
             Debug.Log("Win");
-            Time.timeScale = 0.0f;
             Globals.Instance.gamePaused = true;
             Globals.Instance.levelComplete = true;
 

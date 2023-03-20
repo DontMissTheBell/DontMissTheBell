@@ -3,14 +3,12 @@ using UnityEngine;
 
 public class MenuTransitioner : MonoBehaviour
 {
-    private CinemachineVirtualCamera currentCamera;
+    [SerializeField] private CinemachineVirtualCamera currentCamera;
 
     // Start is called before the first frame update
     private void Start()
     {
-        // Finds default camera
-        currentCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineBrain>()
-            .ActiveVirtualCamera.VirtualCameraGameObject.GetComponent<CinemachineVirtualCamera>();
+        Application.targetFrameRate = 60;
     }
 
 

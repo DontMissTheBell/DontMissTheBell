@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using CompressionLevel = System.IO.Compression.CompressionLevel;
 
 public class GhostManager : MonoBehaviour
@@ -25,14 +28,26 @@ public class GhostManager : MonoBehaviour
     private MemoryStream compressedGhostData;
     private bool currentlyRecording, playbackBegun, ghostDownloaded;
     private BinaryWriter dataWriter;
+    private string endpoint;
     private MemoryStream ghostData;
     private Quaternion idealCameraRotation;
     private ReplayFrame[] replayFrames;
     private uint replayLength, currentFrameIndex;
 
-    private void Awake()
+    private void Start()
     {
+        LevelCompleteEvent += LevelComplete;
+
+        endpoint = Globals.Instance.APIEndpoint;
         idealCameraRotation = cameraTransform.rotation;
+        if (!string.IsNullOrEmpty(Globals.Instance.replayToStart))
+        {
+            shouldRecord = false;
+            shouldReplay = true;
+            ghostID = Globals.Instance.replayToStart;
+            Globals.Instance.replayToStart = "";
+        }
+
         if (shouldRecord)
             SetupRecording();
         else if (shouldReplay) SetupReplay();
@@ -77,6 +92,7 @@ public class GhostManager : MonoBehaviour
             {
                 replayFrames = DecodeGhostData();
                 playbackBegun = true;
+                shouldReplay = false;
             }
             catch (InvalidDataException e)
             {
@@ -84,17 +100,40 @@ public class GhostManager : MonoBehaviour
                 shouldReplay = false;
             }
         }
-        else if (playbackBegun && currentFrameIndex + 1 != replayLength) // Stop when we reach the end of the replay
+        else
         {
-            // Set player transform to data in current frame
-            replayFrames[currentFrameIndex].ExportTransform(transform);
-            // Update ideal camera rotation
-            if (replayFrames[currentFrameIndex].hasCameraTransform)
-                idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
-            //Debug.Log(idealCameraRotation);
-            // We need to move on to the next frame's data
-            currentFrameIndex++;
+            switch (playbackBegun)
+            {
+                // Stop when we reach the end of the replay
+                case true when currentFrameIndex + 1 != replayLength:
+                {
+                    // Set player transform to data in current frame
+                    replayFrames[currentFrameIndex].ExportTransform(transform);
+                    // Update ideal camera rotation
+                    if (replayFrames[currentFrameIndex].hasCameraTransform)
+                        idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
+                    //Debug.Log(idealCameraRotation);
+                    // We need to move on to the next frame's data
+                    currentFrameIndex++;
+                    break;
+                }
+                case true:
+                    playbackBegun = false;
+                    LevelCompleteEvent?.Invoke();
+                    break;
+            }
         }
+    }
+
+    private event EmptyEvent LevelCompleteEvent;
+
+    private void LevelComplete()
+    {
+        shouldRecord = false;
+        shouldReplay = false;
+        Globals.Instance.levelComplete = true;
+        Thread.Sleep(1000);
+        Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
     }
 
     private void SetupRecording()
@@ -106,6 +145,9 @@ public class GhostManager : MonoBehaviour
 
     private void SetupReplay()
     {
+        GetComponent<PlayerMovement>().enabled = false;
+        GetComponent<CharacterController>().enabled = false;
+        GetComponentInChildren<MouseLookMainCharacter>().enabled = false;
         StartCoroutine(DownloadGhost());
     }
 
@@ -204,22 +246,28 @@ public class GhostManager : MonoBehaviour
         Debug.Log($"Final raw data size: {ghostData.Length / 1024}KB");
         compressedGhostData = Compress(ghostData);
         Debug.Log($"Final ghost size: {compressedGhostData.Length / 1024}KB");
-        StartCoroutine(UploadGhost(compressedGhostData.ToArray()));
+        StartCoroutine(UploadGhost(compressedGhostData.ToArray(), 0, SceneManager.GetActiveScene().buildIndex,
+            replayLength));
     }
 
-    private static IEnumerator UploadGhost(byte[] ghostData)
+    private IEnumerator UploadGhost(byte[] ghostData, int playerId, int levelId, uint length)
     {
-        var www = UnityWebRequest.Put("https://dmtb.catpowered.net/api/v1/submit-ghost", ghostData);
+        var www = UnityWebRequest.Put($"{endpoint}/v1/submit-ghost", ghostData);
+        www.SetRequestHeader("X-Player-Id", playerId.ToString());
+        www.SetRequestHeader("X-Level-Id", levelId.ToString());
+        www.SetRequestHeader("X-Replay-Length", length.ToString());
         yield return www.SendWebRequest();
 
         Debug.Log(www.result != UnityWebRequest.Result.Success
             ? www.error
             : $"Upload complete! {www.downloadHandler.text}");
+
+        LevelCompleteEvent?.Invoke();
     }
 
     private IEnumerator DownloadGhost()
     {
-        var www = UnityWebRequest.Get($"https://dmtb.catpowered.net/api/v1/get-ghost/{ghostID}");
+        var www = UnityWebRequest.Get($"{endpoint}/v1/get-ghost/{ghostID}");
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
@@ -234,6 +282,8 @@ public class GhostManager : MonoBehaviour
             Debug.Log($"Successfully downloaded {ghostData.Length / 1024}KB replay");
         }
     }
+
+    private delegate void EmptyEvent();
 }
 
 public class ReplayFrame
