@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -130,6 +131,7 @@ public class GhostManager : MonoBehaviour
     {
         shouldRecord = false;
         shouldReplay = false;
+        Globals.Instance.levelComplete = true;
         Thread.Sleep(1000);
         Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
     }
@@ -259,6 +261,8 @@ public class GhostManager : MonoBehaviour
         Debug.Log(www.result != UnityWebRequest.Result.Success
             ? www.error
             : $"Upload complete! {www.downloadHandler.text}");
+
+        LevelCompleteEvent?.Invoke();
     }
 
     private IEnumerator DownloadGhost()
