@@ -1,30 +1,32 @@
 using System.Collections;
 using DG.Tweening;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Globals : MonoBehaviour
 {
-    // Loading screen
-    private RectTransform loadingScreen;
     private const float LoadDuration = 1.0f;
 
+    private static Globals _instance;
+
     // Debug API toggle
-    [SerializeField] private bool devAPI; 
+    [SerializeField] private bool devAPI;
 
     // Global variables
     public bool gamePaused;
     public bool levelComplete;
-    public string APIEndpoint => devAPI ? "http://localhost:8080/api" : "https://dmtb.catpowered.net/api";
+
     public string replayToStart;
 
-    private static Globals _instance;
+    // Loading screen
+    private RectTransform loadingScreen;
+    public string APIEndpoint => devAPI ? "http://localhost:8080/api" : "https://dmtb.catpowered.net/api";
+
     public static Globals Instance
     {
         get
         {
-            if ( !_instance )
+            if (!_instance)
                 _instance = FindObjectOfType(typeof(Globals)) as Globals;
             if (_instance) return _instance;
 

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Net;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -27,11 +27,11 @@ public class GhostManager : MonoBehaviour
     private MemoryStream compressedGhostData;
     private bool currentlyRecording, playbackBegun, ghostDownloaded;
     private BinaryWriter dataWriter;
+    private string endpoint;
     private MemoryStream ghostData;
     private Quaternion idealCameraRotation;
     private ReplayFrame[] replayFrames;
     private uint replayLength, currentFrameIndex;
-    private string endpoint;
 
     private void Start()
     {
@@ -44,6 +44,7 @@ public class GhostManager : MonoBehaviour
             ghostID = Globals.Instance.replayToStart;
             Globals.Instance.replayToStart = "";
         }
+
         if (shouldRecord)
             SetupRecording();
         else if (shouldReplay) SetupReplay();
@@ -96,26 +97,29 @@ public class GhostManager : MonoBehaviour
                 shouldReplay = false;
             }
         }
-        else switch (playbackBegun)
+        else
         {
-            // Stop when we reach the end of the replay
-            case true when currentFrameIndex + 1 != replayLength:
+            switch (playbackBegun)
             {
-                // Set player transform to data in current frame
-                replayFrames[currentFrameIndex].ExportTransform(transform);
-                // Update ideal camera rotation
-                if (replayFrames[currentFrameIndex].hasCameraTransform)
-                    idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
-                //Debug.Log(idealCameraRotation);
-                // We need to move on to the next frame's data
-                currentFrameIndex++;
-                break;
+                // Stop when we reach the end of the replay
+                case true when currentFrameIndex + 1 != replayLength:
+                {
+                    // Set player transform to data in current frame
+                    replayFrames[currentFrameIndex].ExportTransform(transform);
+                    // Update ideal camera rotation
+                    if (replayFrames[currentFrameIndex].hasCameraTransform)
+                        idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
+                    //Debug.Log(idealCameraRotation);
+                    // We need to move on to the next frame's data
+                    currentFrameIndex++;
+                    break;
+                }
+                case true:
+                    playbackBegun = false;
+                    Thread.Sleep(1000);
+                    Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
+                    break;
             }
-            case true:
-                playbackBegun = false;
-                System.Threading.Thread.Sleep(1000);
-                Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
-                break;
         }
     }
 
@@ -229,7 +233,8 @@ public class GhostManager : MonoBehaviour
         Debug.Log($"Final raw data size: {ghostData.Length / 1024}KB");
         compressedGhostData = Compress(ghostData);
         Debug.Log($"Final ghost size: {compressedGhostData.Length / 1024}KB");
-        StartCoroutine(UploadGhost(compressedGhostData.ToArray(), 0, SceneManager.GetActiveScene().buildIndex, replayLength));
+        StartCoroutine(UploadGhost(compressedGhostData.ToArray(), 0, SceneManager.GetActiveScene().buildIndex,
+            replayLength));
     }
 
     private IEnumerator UploadGhost(byte[] ghostData, int playerId, int levelId, uint length)
