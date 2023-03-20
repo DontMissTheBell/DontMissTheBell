@@ -16,6 +16,7 @@ public class Globals : MonoBehaviour
     public bool gamePaused;
     public bool levelComplete;
     public string APIEndpoint => devAPI ? "http://localhost:8080/api" : "https://dmtb.catpowered.net/api";
+    public string replayToStart;
 
     public static Globals Instance { get; private set; }
 
@@ -32,12 +33,27 @@ public class Globals : MonoBehaviour
     }
 
     // Transition manager
-    public IEnumerator TriggerLoadingScreen(string sceneName)
+    public IEnumerator TriggerLoadingScreen(string sceneName = "", int sceneId = -1)
     {
         loadingScreen.DORotate(Vector3.zero, LoadDuration);
         yield return new WaitForSeconds(LoadDuration);
         DOTween.KillAll();
-        SceneManager.LoadScene(sceneName);
+
+        if (sceneId >= 0)
+        {
+            // Convert BuildIndex (levelId) to scene name
+            sceneName = SceneUtility.GetScenePathByBuildIndex(sceneId);
+            var slashLocation = sceneName.LastIndexOf('/');
+            sceneName = sceneName[slashLocation..];
+            var dotLocation = sceneName.LastIndexOf('.');
+            sceneName = sceneName[..dotLocation];
+            SceneManager.LoadScene(sceneId);
+        }
+        else
+        {
+            SceneManager.LoadScene(sceneName);
+        }
+
         Application.targetFrameRate = sceneName switch
         {
             "Main Menu" => 60,

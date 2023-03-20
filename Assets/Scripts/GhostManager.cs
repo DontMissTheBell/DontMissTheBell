@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using CompressionLevel = System.IO.Compression.CompressionLevel;
 
 public class GhostManager : MonoBehaviour
@@ -29,10 +31,18 @@ public class GhostManager : MonoBehaviour
     private Quaternion idealCameraRotation;
     private ReplayFrame[] replayFrames;
     private uint replayLength, currentFrameIndex;
+    private string endpoint;
 
     private void Awake()
     {
+        endpoint = Globals.Instance.APIEndpoint;
         idealCameraRotation = cameraTransform.rotation;
+        if (Globals.Instance.replayToStart != null)
+        {
+            shouldRecord = false;
+            shouldReplay = true;
+            ghostID = Globals.Instance.replayToStart;
+        }
         if (shouldRecord)
             SetupRecording();
         else if (shouldReplay) SetupReplay();
@@ -204,12 +214,15 @@ public class GhostManager : MonoBehaviour
         Debug.Log($"Final raw data size: {ghostData.Length / 1024}KB");
         compressedGhostData = Compress(ghostData);
         Debug.Log($"Final ghost size: {compressedGhostData.Length / 1024}KB");
-        StartCoroutine(UploadGhost(compressedGhostData.ToArray()));
+        StartCoroutine(UploadGhost(compressedGhostData.ToArray(), 0, SceneManager.GetActiveScene().buildIndex, replayLength));
     }
 
-    private static IEnumerator UploadGhost(byte[] ghostData)
+    private IEnumerator UploadGhost(byte[] ghostData, int playerId, int levelId, uint length)
     {
-        var www = UnityWebRequest.Put($"{Globals.Instance.APIEndpoint}/v1/submit-ghost", ghostData);
+        var www = UnityWebRequest.Put($"{endpoint}/v1/submit-ghost", ghostData);
+        www.SetRequestHeader("X-Player-Id", playerId.ToString());
+        www.SetRequestHeader("X-Level-Id", levelId.ToString());
+        www.SetRequestHeader("X-Replay-Length", length.ToString());
         yield return www.SendWebRequest();
 
         Debug.Log(www.result != UnityWebRequest.Result.Success
@@ -219,7 +232,7 @@ public class GhostManager : MonoBehaviour
 
     private IEnumerator DownloadGhost()
     {
-        var www = UnityWebRequest.Get($"{Globals.Instance.APIEndpoint}/v1/get-ghost/{ghostID}");
+        var www = UnityWebRequest.Get($"{endpoint}/v1/get-ghost/{ghostID}");
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
