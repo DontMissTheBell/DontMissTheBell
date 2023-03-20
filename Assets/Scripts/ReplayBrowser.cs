@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -9,12 +10,13 @@ using UnityEngine.UI;
 public class ReplayBrowser : MonoBehaviour
 {
     private readonly List<GameObject> leaderboardEntries = new();
+    private int currentPage, totalPages;
 
     public void Start()
     {
         RawEntriesDownloaded += ProcessLeaderboardEntries;
         StartCoroutine(DownloadEntries());
-        leaderboardEntries.Add(transform.GetChild(0).gameObject);
+        leaderboardEntries.Add(transform.GetChild(2).gameObject);
     }
 
     private event RawEntries RawEntriesDownloaded;
@@ -24,8 +26,17 @@ public class ReplayBrowser : MonoBehaviour
         // Deserialize LeaderboardSection object
         if (serverResponse == "null") return;
         var leaderboardSection = JsonUtility.FromJson<LeaderboardSection>(serverResponse);
+        currentPage = page;
+        totalPages = leaderboardSection.totalPages;
         // Abort if json did not contain a valid LeaderboardSection object
         if (leaderboardSection.entries == null) return;
+
+        // Clean up old entries from UI
+        foreach (var leaderboardEntry in leaderboardEntries.Skip(1))
+        {
+            Destroy(leaderboardEntry);
+        }
+        leaderboardEntries.RemoveRange(1, leaderboardEntries.Count - 1);
 
         // Create a panel for each LeaderboardEntry object in leaderboardSection.entries
         foreach (var leaderboardEntry in leaderboardSection.entries)
@@ -44,9 +55,12 @@ public class ReplayBrowser : MonoBehaviour
             var button = currentEntry.GetComponentInChildren<Button>();
             button.onClick.AddListener(delegate { StartReplay(leaderboardEntry.ghostId, leaderboardEntry.levelId); });
         }
+
+        var footer = transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>();
+        footer.text = $"Page {page} / {leaderboardSection.totalPages}";
     }
 
-    private IEnumerator DownloadEntries(int page = 1, int pageSize = 10)
+    private IEnumerator DownloadEntries(int page = 1, int pageSize = 6)
     {
         var www = UnityWebRequest.Get($"{Globals.Instance.APIEndpoint}/v1/leaderboard/{page}/{pageSize}");
         yield return www.SendWebRequest();
@@ -56,6 +70,15 @@ public class ReplayBrowser : MonoBehaviour
         else
             //Debug.Log($"Successfully downloaded leaderboard page {page}");
             RawEntriesDownloaded?.Invoke(www.downloadHandler.text, page, pageSize);
+    }
+
+    public void ChangePage(bool next)
+    {
+        var nextPage = currentPage + (Convert.ToInt32(next) * 2 - 1);
+        if (nextPage >= 1 && nextPage <= totalPages)
+        {
+            StartCoroutine(DownloadEntries(currentPage + (Convert.ToInt32(next) * 2 - 1)));
+        }
     }
 
     private static void StartReplay(string ghostId, int levelId)
@@ -81,5 +104,7 @@ public class LeaderboardEntry
 public class LeaderboardSection
 {
     public LeaderboardEntry[] entries;
+    public int pageSize;
+    public int totalPages;
     public int Size => entries.Length;
 }
