@@ -51,10 +51,12 @@ public class Globals : MonoBehaviour
     // Transition manager
     public IEnumerator TriggerLoadingScreen(string sceneName = "", int sceneId = -1)
     {
+        // Start animation
         loadingScreen.DORotate(Vector3.zero, LoadDuration);
         yield return new WaitForSeconds(LoadDuration);
         DOTween.KillAll();
 
+        // Unlock cursor
         Cursor.lockState = CursorLockMode.None;
 
         if (sceneId >= 0)
@@ -72,11 +74,14 @@ public class Globals : MonoBehaviour
             SceneManager.LoadSceneAsync(sceneName);
         }
 
+        // Limit FPS on menu to save power
         Application.targetFrameRate = sceneName switch
         {
             "Main Menu" => 60,
             _ => 300
         };
+
+        // Finish animation
         yield return new WaitForSeconds(0.25f);
         loadingScreen.DORotate(Vector3.left * 90, LoadDuration);
     }
