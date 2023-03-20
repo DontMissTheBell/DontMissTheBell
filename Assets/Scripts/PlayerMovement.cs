@@ -38,16 +38,16 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     [Header("Jump")][SerializeField] private float mcJumpHeight;
 
-    [SerializeField]
-    private float jumpBufferMax = 0.25f; // The time frame that the game will store the players jump input
+    [SerializeField] private float jumpBufferMax = 0.25f; // The time frame that the game will store the players jump input
+    [SerializeField] private float coyoteTime = 0.2f;
+    private float coyoteTimeCounter;
 
     [SerializeField] private float slidePower;
     [SerializeField] private float slideDuration;
 
     [Header("Roll")][SerializeField] private Image damageTint;
+    private readonly float failRollDuration = 2.0f;
 
-    [SerializeField] private float vaultDuration;
-    [SerializeField] private AnimationCurve vaultCurve;
 
     [Header("Wall Run")][SerializeField] private float wallJumpForce;
 
@@ -55,11 +55,24 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField] private float wallRunSpeed;
     [SerializeField] private float wallJumpDelay;
     [SerializeField] private float wallRunTiltMax;
-    private readonly float failRollDuration = 2.0f;
+
+    [Header("Grapple")] [SerializeField]private float grapJumpDelay;
+    private RaycastHit grapData;
+
+    private float grapDistance;
+    [Header("Vault")]     [SerializeField] private float vaultDuration;
+    [SerializeField] private float maxVaultDistance;
+    private RaycastHit vaultData;
+    [SerializeField]private float vaultMaxAngle;
+    [SerializeField] private AnimationCurve vaultUpCurve;
+    [SerializeField] private AnimationCurve vaultDownCurve;
+    private float vaultWidth;
     private MouseLookMainCharacter cameraScript;
     private bool canWallRun;
     private bool canWallRunLeft;
     private bool canWallRunRight;
+    private Vector3 lastWallRunNormal;
+    private Vector3 wallRunNormal;
     private float crouchDelay;
     private float dampingVelocity;
 
@@ -71,9 +84,10 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private float failRollTimer;
     private bool hasDied;
 
-    [Header("Grapple")] private RaycastHit grapData;
-
-    private float grapDistance;
+    private Vector3 vaultPosition;
+    private float vaultTime;
+    private float vaultHeight;
+    private Vector3 vaultDirection;
 
     [Header("Crouch")] private bool isCrouching;
 
@@ -99,16 +113,15 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private Vector3 startVaultPosition;
     private float targetFov;
 
-    [Header("Vault")] private RaycastHit vaultData;
-
-    private Vector3 vaultPosition;
-    private float vaultTime;
 
     private Vector3 velocity;
     private Vector3 wallJumpDistance;
     private float wallJumpTime;
     private float wallRunTilt;
     private float wallRunTime;
+
+    private bool playerOnGround;
+
 
     private void Start()
     {
@@ -157,23 +170,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         // Smoothly changes the cameras FOV depending on if the value of the targetFov value
         playerCamera.fieldOfView = Mathf.SmoothDamp(playerCamera.fieldOfView, targetFov, ref dampingVelocity, 0.1f);
-    }
-
-    public void OnControllerColliderHit(ControllerColliderHit mcFallDamage)
-    {
-        if (ySpeed <= -20f) // If the player falls from high enough to need to roll
-        {
-            if (Input.GetKey(KeyCode.F))
-                StartCoroutine(Roll());
-            else
-                FailRoll();
-        }
-
-        if (ySpeed <= -40f) health = health -= 1;
-        //        else
-        //        {
-        //            MC_Health = MC_Health;         // This code does nothing lol
-        //        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -230,6 +226,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             // If the player has walljumped
             if (wallJumpTime <= wallJumpTimeMax)
             {
+            
+
                 var currentJumpDistance = Vector3.Lerp(wallJumpDistance, Vector3.zero, wallJumpTime / wallJumpTimeMax);
                 velocity += currentJumpDistance;
 
@@ -248,16 +246,41 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             crouchDelay -= Time.deltaTime;
 
+            // Checks if the player lands on the ground
+            if(!controller.isGrounded)
+            {
+                playerOnGround = false;
+            }
+            if(controller.isGrounded && !playerOnGround)
+            {
+                if (ySpeed <= -25f) // If the player falls from high enough to need to roll
+                {
+                    if (Input.GetKey(KeyCode.F))
+                        StartCoroutine(Roll());
+                    else
+                        FailRoll();
+                        health = health -= 1;
+                }
+            }
+
             if (controller.isGrounded)
             {
                 ySpeed = -0.5f;
                 canWallRun = true;
-                if (jumpBuffer > 0f)
+                coyoteTimeCounter = coyoteTime;
+            }
+            else
+            {
+                coyoteTimeCounter -= Time.deltaTime;
+            }
+
+            // If player is in air and pressed jump
+            if (coyoteTimeCounter > 0 && jumpBuffer > 0f)
                 {
                     ySpeed = mcJumpHeight;
                     jumpBuffer = 0f;
+                    coyoteTimeCounter = 0;
                 }
-            }
 
             if (!dodging)
             {
@@ -293,7 +316,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 }
 
                 if (!Input.GetKey(KeyCode.F))
-                    if (isCrouching)
+                    if (isCrouching && !Physics.Raycast(transform.position, Vector3.up, 2, vaultMask.value))
                         EndCrouch();
             }
         }
@@ -303,7 +326,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             WallRun();
             if (!CheckWallRun()) EndWallRun();
             if (wallRunTime >= wallJumpDelay)
-                if (Input.GetButton("Jump"))
+                if (Input.GetButtonDown("Jump"))
                 {
                     WallJump();
                     EndWallRun();
@@ -320,13 +343,20 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             if (slideTime >= 0.1f && !Input.GetKey(KeyCode.F))
             {
+                if (!Physics.Raycast(transform.position, Vector3.up, 2, vaultMask.value))
+                {
                 EndCrouch();
                 EndSlide();
+                }
+                else
+                {
+                EndSlide();
+                }
             }
 
             if (slideTime >= slideDuration)
             {
-                if (!Input.GetKey(KeyCode.F))
+                if (!Input.GetKey(KeyCode.F) && !Physics.Raycast(transform.position, Vector3.up, 2, vaultMask.value))
                 {
                     EndCrouch();
                     EndSlide();
@@ -343,11 +373,20 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             vaultTime += Time.deltaTime;
             vaultPosition = Vector3.Lerp(startVaultPosition, endVaultPosition, vaultTime / vaultDuration);
 
-            var vaultY = Mathf.Lerp(0, 2.0f, vaultCurve.Evaluate(vaultTime / vaultDuration * 2));
+            var vaultY = 0f;
+
+            // First half of the vault
+            if (vaultTime < vaultDuration /2)
+            {
+            vaultY = Mathf.Lerp(0, vaultHeight, vaultUpCurve.Evaluate(vaultTime / vaultDuration));
+            }
+            // Second half
+            else
+            {
+            vaultY = Mathf.Lerp(0, vaultHeight, vaultDownCurve.Evaluate(vaultTime / vaultDuration));
+            }
 
             vaultPosition.y += vaultY;
-
-            print(vaultY);
 
             transform.position = vaultPosition;
 
@@ -358,27 +397,93 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     private void Vault()
     {
-        float vaultWidth = 0;
         if (vaultData.normal.x != 0)
             vaultWidth = vaultData.transform.gameObject.GetComponent<BoxCollider>().size.x *
                          vaultData.transform.localScale.x;
         if (vaultData.normal.z != 0)
             vaultWidth = vaultData.transform.gameObject.GetComponent<BoxCollider>().size.z *
                          vaultData.transform.localScale.z;
+
+
         startVaultPosition = transform.position;
         endVaultPosition = startVaultPosition + transform.forward * (vaultWidth + vaultData.distance * 2);
+
+        RaycastHit exitPoint;
+
+        Physics.Raycast(endVaultPosition, -transform.forward,
+            out exitPoint, vaultWidth*2, vaultMask.value);
+
+        endVaultPosition = exitPoint.point + (transform.forward * (vaultData.distance));
+
+
         mState = MovementStates.Vault;
 
+        // This part calculates the height that the player needs to go to travel over the object
+        var objectHeight = (vaultData.transform.gameObject.GetComponent<BoxCollider>().size.y *
+                             vaultData.transform.localScale.y);
+
+        var vaultHeightWorld = objectHeight / 2 + vaultData.transform.position.y;
+
+        vaultHeight = (vaultHeightWorld - vaultData.point.y);
+
+
+
         vaultTime = 0;
+        jumpBuffer = 0;
+        ySpeed = -0.5f;
     }
 
     private bool CheckVault()
     {
+        // Checks if there is a vaultable object close enough to the player
         if (Physics.Raycast(groundCheck.transform.position, groundCheck.transform.TransformDirection(Vector3.forward),
                 out vaultData, 1.5f, vaultMask.value) &&
-            !Physics.CheckSphere(groundCheck.transform.position + groundCheck.transform.forward * 6, 1,
-                vaultMask.value)) return true;
+            // It then checks further forwards to make sure that the object is thin enough for the player to vault over
+            !Physics.CheckSphere(groundCheck.transform.position + groundCheck.transform.forward * maxVaultDistance, 1,
+                vaultMask.value) &&
+                // Next it checks the angle that the player is look at, as well as the normal of the wall.
+                // This ensures that the player cant slide across long angles causing buggy behaviour
+                    VaultAngleCheck() //&&
+                        // Lastly, it checks the length of the vault to ensure its not too long
+                            //VaultLengthCheck()
+                        ) return true;
         return false;
+    }
+
+    // private bool VaultLengthCheck()
+    // {
+
+    //     if (vaultData.normal.x != 0)
+    //         vaultWidth = vaultData.transform.gameObject.GetComponent<BoxCollider>().size.x *
+    //                      vaultData.transform.localScale.x;
+    //     if (vaultData.normal.z != 0)
+    //         vaultWidth = vaultData.transform.gameObject.GetComponent<BoxCollider>().size.z *
+    //                      vaultData.transform.localScale.z;
+
+    //     var vaultAngle = Vector3.Angle(vaultData.normal,-vaultDirection);
+
+    //     vaultAngle = 90 - vaultAngle;
+
+    //     var vaultLength = vaultWidth / Mathf.Sin(vaultAngle);
+
+    //     //print("Box Width:   " + vaultWidth);
+    //     //print("Line Angle:   " + vaultAngle);
+    //     //print("Vault Length:   " + vaultLength);
+    //     //print("");
+
+    //     return true;
+    // }
+
+    private bool VaultAngleCheck()
+    {
+        vaultDirection = transform.forward;
+
+        var vaultDirectionCheck = vaultDirection - -vaultData.normal;
+
+        if ((vaultDirectionCheck.x <= -vaultMaxAngle || vaultDirectionCheck.x >= vaultMaxAngle) || 
+            (vaultDirectionCheck.z <= -vaultMaxAngle || vaultDirectionCheck.z >= vaultMaxAngle)) return false;
+
+        return true;
     }
 
     private bool CheckGrap()
@@ -397,11 +502,18 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             grapDistance = grapHeightWorld - grapLocation.y;
 
-            if (grapDistance <= 2) // If the player is high enough to grapple, then return true
+            if (grapDistance <= 2 && CheckGrapHeight()) // If the player is high enough to grapple, then return true
                 return true;
         }
 
         return false;
+    }
+
+    private bool CheckGrapHeight()
+    {
+        if (Physics.Raycast(transform.position, -Vector3.up, 5, groundMask.value)) return false;
+        return true;
+        
     }
 
     private void Grap()
@@ -411,7 +523,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         transform.position += transform.forward * grapData.distance;
         transform.position += new Vector3(0, grapDistance + 0.25f, 0);
         ySpeed = -0.5f;
-        jumpDelay = 0.25f;
+        jumpDelay = grapJumpDelay;
     }
 
     private void StartCrouch()
@@ -468,6 +580,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     {
         mState = MovementStates.WallRun;
         ySpeed = 0;
+        jumpBuffer = 0;
         wallRunTime = 0f;
         wallRunTilt = canWallRunRight ? wallRunTiltMax : -wallRunTiltMax;
         cameraScript.StartTiltScreen(0.25f, wallRunTilt, false);
@@ -490,6 +603,18 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             out leftWallData, 2f, vaultMask.value);
         canWallRunRight = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right),
             out rightWallData, 2f, vaultMask.value);
+
+        // Makes sure the player hasnt gone around a wall
+        wallRunNormal = canWallRunRight ? rightWallData.normal : leftWallData.normal;
+        var diff = wallRunNormal - lastWallRunNormal;
+
+        lastWallRunNormal = wallRunNormal;
+        // If the difference between the normals between this frame and the last frame are more than a quarter then stop the wallrun
+        if((diff.x > 0.50f || diff.x < -0.50) ||
+            (diff.z > 0.50f || diff.z < -0.50))
+            return false;
+
+
         if (canWallRunRight) return canWallRunRight;
         if (canWallRunLeft)
             return canWallRunLeft;
@@ -502,7 +627,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         wallJumpDistance = transform.up * mcJumpHeight + normal * wallJumpForce;
         wallJumpTime = 0;
-        jumpDelay = 0.25f;
+        jumpDelay = 0.1f;
         jumpBuffer = 0;
     }
 
