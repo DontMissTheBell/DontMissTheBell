@@ -16,7 +16,6 @@ public class ReplayBrowser : MonoBehaviour
     private void ProcessLeaderboardEntries(string serverResponse, int page, int pageSize)
     {
         // Deserialize LeaderboardSection object
-        Debug.Log(serverResponse);
         if (serverResponse == "null") { return; }
         var leaderboardSection = JsonUtility.FromJson<LeaderboardSection>(serverResponse);
         // Abort if json did not contain a valid LeaderboardSection object

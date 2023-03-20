@@ -1,5 +1,6 @@
 using System.Collections;
 using DG.Tweening;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,15 +19,28 @@ public class Globals : MonoBehaviour
     public string APIEndpoint => devAPI ? "http://localhost:8080/api" : "https://dmtb.catpowered.net/api";
     public string replayToStart;
 
-    public static Globals Instance { get; private set; }
+    private static Globals _instance;
+    public static Globals Instance
+    {
+        get
+        {
+            if ( !_instance )
+                _instance = FindObjectOfType(typeof(Globals)) as Globals;
+            if (_instance) return _instance;
+
+            var obj = new GameObject("GlobalsHost");
+            _instance = obj.AddComponent<Globals>();
+            DontDestroyOnLoad(obj);
+
+            return _instance;
+        }
+    }
 
     // Avoid duplication
     private void Awake()
     {
-        if (Instance != null && Instance != this) Destroy(gameObject);
-        Instance = this;
+        if (Instance != this) Destroy(gameObject);
         DontDestroyOnLoad(gameObject);
-
         loadingScreen = GameObject.FindGameObjectWithTag("LoadingScreen").GetComponent<RectTransform>();
 
         gamePaused = 0.0f == Time.timeScale;

@@ -33,15 +33,16 @@ public class GhostManager : MonoBehaviour
     private uint replayLength, currentFrameIndex;
     private string endpoint;
 
-    private void Awake()
+    private void Start()
     {
         endpoint = Globals.Instance.APIEndpoint;
         idealCameraRotation = cameraTransform.rotation;
-        if (Globals.Instance.replayToStart != null)
+        if (!string.IsNullOrEmpty(Globals.Instance.replayToStart))
         {
             shouldRecord = false;
             shouldReplay = true;
             ghostID = Globals.Instance.replayToStart;
+            Globals.Instance.replayToStart = "";
         }
         if (shouldRecord)
             SetupRecording();
@@ -87,6 +88,7 @@ public class GhostManager : MonoBehaviour
             {
                 replayFrames = DecodeGhostData();
                 playbackBegun = true;
+                shouldReplay = false;
             }
             catch (InvalidDataException e)
             {
@@ -94,16 +96,26 @@ public class GhostManager : MonoBehaviour
                 shouldReplay = false;
             }
         }
-        else if (playbackBegun && currentFrameIndex + 1 != replayLength) // Stop when we reach the end of the replay
+        else switch (playbackBegun)
         {
-            // Set player transform to data in current frame
-            replayFrames[currentFrameIndex].ExportTransform(transform);
-            // Update ideal camera rotation
-            if (replayFrames[currentFrameIndex].hasCameraTransform)
-                idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
-            //Debug.Log(idealCameraRotation);
-            // We need to move on to the next frame's data
-            currentFrameIndex++;
+            // Stop when we reach the end of the replay
+            case true when currentFrameIndex + 1 != replayLength:
+            {
+                // Set player transform to data in current frame
+                replayFrames[currentFrameIndex].ExportTransform(transform);
+                // Update ideal camera rotation
+                if (replayFrames[currentFrameIndex].hasCameraTransform)
+                    idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
+                //Debug.Log(idealCameraRotation);
+                // We need to move on to the next frame's data
+                currentFrameIndex++;
+                break;
+            }
+            case true:
+                playbackBegun = false;
+                System.Threading.Thread.Sleep(1000);
+                Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
+                break;
         }
     }
 
@@ -116,6 +128,9 @@ public class GhostManager : MonoBehaviour
 
     private void SetupReplay()
     {
+        GetComponent<PlayerMovement>().enabled = false;
+        GetComponent<CharacterController>().enabled = false;
+        GetComponentInChildren<MouseLookMainCharacter>().enabled = false;
         StartCoroutine(DownloadGhost());
     }
 
