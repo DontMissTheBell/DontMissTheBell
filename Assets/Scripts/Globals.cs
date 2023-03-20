@@ -55,6 +55,8 @@ public class Globals : MonoBehaviour
         yield return new WaitForSeconds(LoadDuration);
         DOTween.KillAll();
 
+        Cursor.lockState = CursorLockMode.None;
+
         if (sceneId >= 0)
         {
             // Convert BuildIndex (levelId) to scene name
@@ -63,11 +65,11 @@ public class Globals : MonoBehaviour
             sceneName = sceneName[slashLocation..];
             var dotLocation = sceneName.LastIndexOf('.');
             sceneName = sceneName[..dotLocation];
-            SceneManager.LoadScene(sceneId);
+            SceneManager.LoadSceneAsync(sceneId);
         }
         else
         {
-            SceneManager.LoadScene(sceneName);
+            SceneManager.LoadSceneAsync(sceneName);
         }
 
         Application.targetFrameRate = sceneName switch

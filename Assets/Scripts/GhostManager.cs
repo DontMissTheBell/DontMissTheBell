@@ -35,6 +35,8 @@ public class GhostManager : MonoBehaviour
 
     private void Start()
     {
+        LevelCompleteEvent += LevelComplete;
+
         endpoint = Globals.Instance.APIEndpoint;
         idealCameraRotation = cameraTransform.rotation;
         if (!string.IsNullOrEmpty(Globals.Instance.replayToStart))
@@ -116,11 +118,20 @@ public class GhostManager : MonoBehaviour
                 }
                 case true:
                     playbackBegun = false;
-                    Thread.Sleep(1000);
-                    Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
+                    LevelCompleteEvent?.Invoke();
                     break;
             }
         }
+    }
+
+    private event EmptyEvent LevelCompleteEvent;
+
+    private void LevelComplete()
+    {
+        shouldRecord = false;
+        shouldReplay = false;
+        Thread.Sleep(1000);
+        Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
     }
 
     private void SetupRecording()
@@ -267,6 +278,8 @@ public class GhostManager : MonoBehaviour
             Debug.Log($"Successfully downloaded {ghostData.Length / 1024}KB replay");
         }
     }
+
+    private delegate void EmptyEvent();
 }
 
 public class ReplayFrame
