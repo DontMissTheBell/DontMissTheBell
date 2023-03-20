@@ -209,7 +209,7 @@ public class GhostManager : MonoBehaviour
 
     private static IEnumerator UploadGhost(byte[] ghostData)
     {
-        var www = UnityWebRequest.Put("https://dmtb.catpowered.net/api/v1/submit-ghost", ghostData);
+        var www = UnityWebRequest.Put($"{Globals.Instance.APIEndpoint}/v1/submit-ghost", ghostData);
         yield return www.SendWebRequest();
 
         Debug.Log(www.result != UnityWebRequest.Result.Success
@@ -219,7 +219,7 @@ public class GhostManager : MonoBehaviour
 
     private IEnumerator DownloadGhost()
     {
-        var www = UnityWebRequest.Get($"https://dmtb.catpowered.net/api/v1/get-ghost/{ghostID}");
+        var www = UnityWebRequest.Get($"{Globals.Instance.APIEndpoint}/v1/get-ghost/{ghostID}");
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)

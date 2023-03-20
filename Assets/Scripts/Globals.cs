@@ -9,9 +9,13 @@ public class Globals : MonoBehaviour
     private RectTransform loadingScreen;
     private const float LoadDuration = 1.0f;
 
+    // Debug API toggle
+    [SerializeField] private bool devAPI; 
+
     // Global variables
     public bool gamePaused;
     public bool levelComplete;
+    public string APIEndpoint => devAPI ? "http://localhost:8080/api" : "https://dmtb.catpowered.net/api";
 
     public static Globals Instance { get; private set; }
 
