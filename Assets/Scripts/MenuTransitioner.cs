@@ -8,6 +8,7 @@ public class MenuTransitioner : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+        Application.targetFrameRate = 60;
         // Finds default camera
         currentCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineBrain>()
             .ActiveVirtualCamera.VirtualCameraGameObject.GetComponent<CinemachineVirtualCamera>();

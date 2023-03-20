@@ -34,6 +34,11 @@ public class Globals : MonoBehaviour
         yield return new WaitForSeconds(LoadDuration);
         DOTween.KillAll();
         SceneManager.LoadScene(sceneName);
+        Application.targetFrameRate = sceneName switch
+        {
+            "Main Menu" => 60,
+            _ => 300
+        };
         yield return new WaitForSeconds(0.25f);
         loadingScreen.DORotate(Vector3.left * 90, LoadDuration);
     }
