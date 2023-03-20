@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1445600794}
-  m_IndirectSpecularColor: {r: 0.4465829, g: 0.49641728, b: 0.57482105, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465822, g: 0.4964162, b: 0.57482, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   homework: {fileID: 780089610}
-  timer: {fileID: 1016136721}
+  timer: {fileID: 0}
 --- !u!1 &121426444
 GameObject:
   m_ObjectHideFlags: 0
@@ -367,8 +367,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 603294615}
-  - {fileID: 1016136720}
   - {fileID: 2044589074}
+  - {fileID: 1209398321}
   m_Father: {fileID: 0}
   m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6415,53 +6415,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7b16e74e0ab45a743989ca2d3ad0bf7c, type: 3}
---- !u!1 &1016136719
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1016136720}
-  - component: {fileID: 1016136721}
-  m_Layer: 0
-  m_Name: Timer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1016136720
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016136719}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -397.82953, y: -236.73871, z: -74.55842}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1209398321}
-  m_Father: {fileID: 121426448}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1016136721
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016136719}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c886f1c0b0ef99b4b9fcc9a2da9573e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeLimit: 0
-  timerText: {fileID: 0}
 --- !u!1 &1091642794
 GameObject:
   m_ObjectHideFlags: 0
@@ -6579,8 +6532,9 @@ GameObject:
   - component: {fileID: 1209398321}
   - component: {fileID: 1209398323}
   - component: {fileID: 1209398322}
+  - component: {fileID: 1209398324}
   m_Layer: 5
-  m_Name: TimeText
+  m_Name: Timer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6594,16 +6548,16 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1209398320}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 74.55842}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1016136720}
+  m_Father: {fileID: 121426448}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 52, y: 461}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -25}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1209398322
@@ -6653,13 +6607,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
+  m_fontSize: 72
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -6689,7 +6643,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -40.899048, w: -90.88684}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -6703,6 +6657,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1209398320}
   m_CullTransparentMesh: 1
+--- !u!114 &1209398324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1209398320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c886f1c0b0ef99b4b9fcc9a2da9573e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeLimit: 30
+  timerText: {fileID: 1209398322}
 --- !u!1 &1260788467
 GameObject:
   m_ObjectHideFlags: 0
@@ -12209,6 +12177,7 @@ MonoBehaviour:
   wallRunTiltMax: 7.5
   grapJumpDelay: 0
   vaultDuration: 0.25
+  maxVaultDistance: 0
   vaultMaxAngle: 0
   vaultUpCurve:
     serializedVersion: 2
@@ -17451,6 +17420,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 603294616}
     - target: {fileID: 629006821951210365, guid: 4d18cd59665733748a524eff5aba0559, type: 3}
+      propertyPath: maxVaultDistance
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 629006821951210365, guid: 4d18cd59665733748a524eff5aba0559, type: 3}
       propertyPath: vaultCurve.m_PostInfinity
       value: 0
       objectReference: {fileID: 0}
@@ -17568,11 +17541,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 629006821951210367, guid: 4d18cd59665733748a524eff5aba0559, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -82.8
+      value: 50.8
       objectReference: {fileID: 0}
     - target: {fileID: 629006821951210367, guid: 4d18cd59665733748a524eff5aba0559, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 25.06
+      value: 22.7
       objectReference: {fileID: 0}
     - target: {fileID: 629006821951210367, guid: 4d18cd59665733748a524eff5aba0559, type: 3}
       propertyPath: m_LocalPosition.z

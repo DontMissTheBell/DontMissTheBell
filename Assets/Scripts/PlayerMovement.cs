@@ -61,6 +61,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     private float grapDistance;
     [Header("Vault")]     [SerializeField] private float vaultDuration;
+    [SerializeField] private float maxVaultDistance;
     private RaycastHit vaultData;
     [SerializeField]private float vaultMaxAngle;
     [SerializeField] private AnimationCurve vaultUpCurve;
@@ -396,17 +397,34 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     private void Vault()
     {
+        if (vaultData.normal.x != 0)
+            vaultWidth = vaultData.transform.gameObject.GetComponent<BoxCollider>().size.x *
+                         vaultData.transform.localScale.x;
+        if (vaultData.normal.z != 0)
+            vaultWidth = vaultData.transform.gameObject.GetComponent<BoxCollider>().size.z *
+                         vaultData.transform.localScale.z;
+
+
         startVaultPosition = transform.position;
         endVaultPosition = startVaultPosition + transform.forward * (vaultWidth + vaultData.distance * 2);
+
+        RaycastHit exitPoint;
+
+        Physics.Raycast(endVaultPosition, -transform.forward,
+            out exitPoint, vaultWidth*2, vaultMask.value);
+
+        endVaultPosition = exitPoint.point + (transform.forward * (vaultData.distance));
+
+
         mState = MovementStates.Vault;
 
         // This part calculates the height that the player needs to go to travel over the object
-        var objectHeight = vaultData.transform.gameObject.GetComponent<BoxCollider>().size.y *
-                             vaultData.transform.localScale.y;
+        var objectHeight = (vaultData.transform.gameObject.GetComponent<BoxCollider>().size.y *
+                             vaultData.transform.localScale.y);
 
         var vaultHeightWorld = objectHeight / 2 + vaultData.transform.position.y;
 
-        vaultHeight = vaultHeightWorld - vaultData.point.y;
+        vaultHeight = (vaultHeightWorld - vaultData.point.y);
 
 
 
@@ -421,40 +439,40 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         if (Physics.Raycast(groundCheck.transform.position, groundCheck.transform.TransformDirection(Vector3.forward),
                 out vaultData, 1.5f, vaultMask.value) &&
             // It then checks further forwards to make sure that the object is thin enough for the player to vault over
-            !Physics.CheckSphere(groundCheck.transform.position + groundCheck.transform.forward * 6, 1,
+            !Physics.CheckSphere(groundCheck.transform.position + groundCheck.transform.forward * maxVaultDistance, 1,
                 vaultMask.value) &&
                 // Next it checks the angle that the player is look at, as well as the normal of the wall.
                 // This ensures that the player cant slide across long angles causing buggy behaviour
-                    VaultAngleCheck() &&
+                    VaultAngleCheck() //&&
                         // Lastly, it checks the length of the vault to ensure its not too long
-                            VaultLengthCheck()
+                            //VaultLengthCheck()
                         ) return true;
         return false;
     }
 
-    private bool VaultLengthCheck()
-    {
+    // private bool VaultLengthCheck()
+    // {
 
-        if (vaultData.normal.x != 0)
-            vaultWidth = vaultData.transform.gameObject.GetComponent<BoxCollider>().size.x *
-                         vaultData.transform.localScale.x;
-        if (vaultData.normal.z != 0)
-            vaultWidth = vaultData.transform.gameObject.GetComponent<BoxCollider>().size.z *
-                         vaultData.transform.localScale.z;
+    //     if (vaultData.normal.x != 0)
+    //         vaultWidth = vaultData.transform.gameObject.GetComponent<BoxCollider>().size.x *
+    //                      vaultData.transform.localScale.x;
+    //     if (vaultData.normal.z != 0)
+    //         vaultWidth = vaultData.transform.gameObject.GetComponent<BoxCollider>().size.z *
+    //                      vaultData.transform.localScale.z;
 
-        var vaultAngle = Vector3.Angle(vaultData.normal,-vaultDirection);
+    //     var vaultAngle = Vector3.Angle(vaultData.normal,-vaultDirection);
 
-        vaultAngle = 90 - vaultAngle;
+    //     vaultAngle = 90 - vaultAngle;
 
-        var vaultLength = vaultWidth / Mathf.Sin(vaultAngle);
+    //     var vaultLength = vaultWidth / Mathf.Sin(vaultAngle);
 
-        //print("Box Width:   " + vaultWidth);
-        //print("Line Angle:   " + vaultAngle);
-        //print("Vault Length:   " + vaultLength);
-        //print("");
+    //     //print("Box Width:   " + vaultWidth);
+    //     //print("Line Angle:   " + vaultAngle);
+    //     //print("Vault Length:   " + vaultLength);
+    //     //print("");
 
-        return true;
-    }
+    //     return true;
+    // }
 
     private bool VaultAngleCheck()
     {
