@@ -59,6 +59,11 @@ public class Globals : MonoBehaviour
         // Unlock cursor
         Cursor.lockState = CursorLockMode.None;
 
+        // Reset level-relative variables
+        gamePaused = false;
+        levelComplete = false;
+        replayToStart = "";
+
         if (sceneId >= 0)
         {
             // Convert BuildIndex (levelId) to scene name
