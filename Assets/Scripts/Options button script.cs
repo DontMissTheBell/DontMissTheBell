@@ -25,4 +25,6 @@ public class Optionsbuttonscript : MonoBehaviour
     {
         QualitySettings.SetQualityLevel(qualityIndex);
     }
+
+    //void for volume here when get music
 }
