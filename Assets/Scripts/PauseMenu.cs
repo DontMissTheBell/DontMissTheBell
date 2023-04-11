@@ -19,7 +19,7 @@ public class PauseMenu : MonoBehaviour
             if (Time.timeScale == 1.0f)
                 Cursor.lockState = CursorLockMode.Locked;
             else
-                Cursor.lockState = CursorLockMode.None;
+                Cursor.lockState = CursorLockMode.None; 
         }
     }
 }
