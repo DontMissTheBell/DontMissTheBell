@@ -80,7 +80,7 @@ MonoBehaviour:
   health: 50
   walkSpeed: 10
   sprintSpeed: 2
-  gravity: -30
+  gravity: -40
   ySpeed: 0
   powerupParticle: {fileID: 629006822164453823}
   groundCheck: {fileID: 629006823114628732}
@@ -103,15 +103,10 @@ MonoBehaviour:
   wallJumpTimeMax: 0.5
   wallRunSpeed: 15
   wallJumpDelay: 0.05
-  wallJumpCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   wallRunTiltMax: 7.5
   grapJumpDelay: 0.1
   vaultDuration: 0.35
+  maxVaultDistance: 6
   vaultMaxAngle: 0.6
   vaultUpCurve:
     serializedVersion: 2
@@ -119,21 +114,12 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 2.904423
-      outSlope: 2.904423
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.770202
-    - serializedVersion: 3
-      time: 0.33
-      value: 0.75
-      inSlope: 1.7120885
-      outSlope: 1.2103866
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.20454553
-      outWeight: 0.15203981
+      outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
@@ -152,26 +138,26 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: -0.46015742
-      outSlope: -0.46015742
+      inSlope: -0.72639424
+      outSlope: -0.72639424
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.7671238
-      value: 0.6470023
-      inSlope: -1.6192338
-      outSlope: -1.6192338
-      tangentMode: 34
+      time: 0.56712687
+      value: 0.5880423
+      inSlope: -0.857461
+      outSlope: -0.857461
+      tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
+      inWeight: 0.18526842
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: -2.7783103
-      outSlope: -2.7783103
+      inSlope: -1.3584634
+      outSlope: -1.3584634
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
