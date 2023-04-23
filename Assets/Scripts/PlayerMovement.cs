@@ -258,6 +258,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             // Checks if the player lands on the ground
             if (!controller.isGrounded) playerOnGround = false;
             if (controller.isGrounded && !playerOnGround)
+            {
                 if (ySpeed <= -25f) // If the player falls from high enough to need to roll
                 {
                     if (Input.GetKey(KeyCode.F))
@@ -266,6 +267,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                         FailRoll();
                     health = health -= 1;
                 }
+                playerOnGround = true;
+            }
 
             if (controller.isGrounded)
             {
@@ -339,6 +342,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         if (mState == MovementStates.Slide)
         {
+            
             slideTime += Time.deltaTime;
             var t = slideTime / slideDuration;
             t = Mathf.Sin(t * Mathf.PI * 0.5f);
@@ -375,16 +379,17 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         if (mState == MovementStates.Vault)
         {
             vaultTime += Time.deltaTime;
+            
             vaultPosition = Vector3.Lerp(startVaultPosition, endVaultPosition, vaultTime / vaultDuration);
 
             var vaultY = 0f;
 
             // First half of the vault
             if (vaultTime < vaultDuration / 2)
-                vaultY = Mathf.Lerp(0, vaultHeight, vaultUpCurve.Evaluate(vaultTime / vaultDuration));
+                vaultY = Mathf.Lerp(0, vaultHeight, vaultUpCurve.Evaluate((vaultTime / vaultDuration))*2);
             // Second half
             else
-                vaultY = Mathf.Lerp(0, vaultHeight, vaultDownCurve.Evaluate(vaultTime / vaultDuration));
+                vaultY = Mathf.Lerp(0, vaultHeight, vaultDownCurve.Evaluate((vaultTime / vaultDuration))*2);
 
             vaultPosition.y += vaultY;
 
@@ -440,12 +445,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             // It then checks further forwards to make sure that the object is thin enough for the player to vault over
             !Physics.CheckSphere(groundCheck.transform.position + groundCheck.transform.forward * maxVaultDistance, 1,
                 vaultMask.value) &&
-            // Next it checks the angle that the player is look at, as well as the normal of the wall.
+            // Lastly it checks the angle that the player is look at, as well as the normal of the wall.
             // This ensures that the player cant slide across long angles causing buggy behaviour
-            VaultAngleCheck() //&&
-            // Lastly, it checks the length of the vault to ensure its not too long
-            //VaultLengthCheck()
-           ) return true;
+            VaultAngleCheck()) return true;
         return false;
     }
 
@@ -554,13 +556,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     {
         mState = MovementStates.Slide;
 
-        slideDirection = playerCamera.transform.forward;
-
-        // This section ensures the direction is straight and not up or down
-        var slideMag = slideDirection.magnitude;
-        slideDirection.y = 0;
-
-        slideDirection = Vector3.Normalize(slideDirection) * slideMag;
+        slideDirection = transform.forward;
 
         slideTime = 0;
 
@@ -610,7 +606,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         // If the difference between the normals between this frame and the last frame are more than a quarter then stop the wallrun
         if (diff.x > 0.50f || diff.x < -0.50 ||
             diff.z > 0.50f || diff.z < -0.50)
-            return false;
+            return false; 
 
 
         if (canWallRunRight) return canWallRunRight;
@@ -657,6 +653,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         var duration = 0.5f;
         var t = 0.0f;
 
+        // This function will ensure that the player will finish the roll looking straight ahead
         cameraScript.StartRoll(duration);
 
         while (t < duration)
@@ -675,8 +672,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private void FailRoll()
     {
         walkSpeed /= 2;
-        damageTint.DOFade(1, 0.1f).OnComplete(() => damageTint.DOFade(0, failRollDuration - 0.1f));
-
+        
+        damageTint.DOFade(1, 0.1f).OnComplete(() => 
+            damageTint.DOFade(0, failRollDuration - 0.1f));
         playerCamera.DOShakePosition(0.35f, 1, 20, 45, randomnessMode: ShakeRandomnessMode.Harmonic);
 
         failRoll = true;
@@ -705,7 +703,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             // Smoothly moves the player towards their new dodge position
             transform.position = Vector3.Lerp(startPos, endPos,
-                Mathf.SmoothStep(0.0f, 1.0f, Mathf.SmoothStep(0.0f, 1.0f, dodgeTime / dodgeDuration)));
+                Mathf.SmoothStep(0.0f, 1.0f, 
+                    Mathf.SmoothStep(0.0f, 1.0f, dodgeTime / dodgeDuration)));
             dodgeTime += Time.deltaTime;
 
             oldPos = transform.position
