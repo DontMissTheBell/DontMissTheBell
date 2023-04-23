@@ -192,6 +192,15 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             Destroy(otherScript.particles.gameObject, 1f);
             StartCoroutine(Powerup_Effect());
         }
+
+        if (other.gameObject
+            .CompareTag("Homework"))
+        {
+            var otherScript = other.GetComponent<Objectives>();
+            otherScript.tweener1.Kill();
+            otherScript.tweener2.Kill();
+            Destroy(other.gameObject);
+        }
     }
 
     private void MovementState()
