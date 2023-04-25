@@ -156,7 +156,10 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             isSprinting = false;
         }
 
+        if (!Globals.Instance.cutsceneActive)
+        {
         MovementState();
+        }
 
         // If the player has failed a roll
         if (failRoll)

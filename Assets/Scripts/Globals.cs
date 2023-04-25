@@ -16,6 +16,8 @@ public class Globals : MonoBehaviour
     public bool gamePaused;
     public bool levelComplete;
 
+    public bool cutsceneActive;
+
     public string replayToStart;
 
     // Loading screen
