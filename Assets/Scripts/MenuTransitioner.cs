@@ -23,6 +23,6 @@ public class MenuTransitioner : MonoBehaviour
 
     public void StartGame()
     {
-        Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Test"));
+        Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Level1"));
     }
 }
