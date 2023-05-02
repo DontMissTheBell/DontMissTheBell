@@ -4,8 +4,7 @@ using DG.Tweening;
 
 public class PauseMenu : MonoBehaviour
 {
-    public GameObject panel;
-    
+    public GameObject panel;    
     // Start is called before the first frame update
     private void Start()
     {
@@ -38,8 +37,11 @@ public class PauseMenu : MonoBehaviour
     }
     public void resumE()
     {
+        Globals.Instance.gameResumed = 1.0f == Time.timeScale;
+        panel.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
         Time.timeScale = 1.0f;
+        gameObject.GetComponentInChildren<Canvas>(false).enabled = 0.0f == Time.timeScale;
     }
     
 }
