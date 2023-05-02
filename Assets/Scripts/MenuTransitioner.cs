@@ -25,4 +25,13 @@ public class MenuTransitioner : MonoBehaviour
     {
         Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Level1"));
     }
+    public void BTmain()
+    {
+        Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
+    }
+    public void Exit()
+    {
+        Application.Quit();
+    }
+
 }
