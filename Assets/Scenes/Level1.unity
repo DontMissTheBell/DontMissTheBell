@@ -9876,6 +9876,10 @@ PrefabInstance:
       propertyPath: panel
       value: 
       objectReference: {fileID: 1419114561}
+    - target: {fileID: 5162832115804445970, guid: 27ee21ea8f131e14a9bf58db4862ddc5, type: 3}
+      propertyPath: pause
+      value: 
+      objectReference: {fileID: 1404691346}
     - target: {fileID: 5162832115804445971, guid: 27ee21ea8f131e14a9bf58db4862ddc5, type: 3}
       propertyPath: m_RootOrder
       value: 8
@@ -43078,6 +43082,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8d2be30e297b3ba4ea9aaa23faa1d3fb, type: 3}
   m_PrefabInstance: {fileID: 1403137101}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1404691346 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5162832115804445969, guid: 27ee21ea8f131e14a9bf58db4862ddc5, type: 3}
+  m_PrefabInstance: {fileID: 301790701}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1406930914 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6956368325587044230, guid: 5214a0b35c3c6694ab71757afdd39b6d, type: 3}
@@ -54545,7 +54554,7 @@ GameObject:
   - component: {fileID: 1798621639}
   - component: {fileID: 1798621638}
   m_Layer: 0
-  m_Name: need
+  m_Name: PauseOp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
