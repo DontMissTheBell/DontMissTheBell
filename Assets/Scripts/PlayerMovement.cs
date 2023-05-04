@@ -13,7 +13,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     [SerializeField] private int health;
 
-    [SerializeField] private float walkSpeed;
+    [SerializeField] private float defaultWalkSpeed;
+
+    private float walkSpeed;
 
     [SerializeField] private float sprintSpeed;
 
@@ -131,6 +133,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         targetFov = defaultFov;
 
         cameraScript = playerCamera.GetComponent<MouseLookMainCharacter>();
+
+        walkSpeed = defaultWalkSpeed;
     }
 
     // used a normal update for things that use a character controller as fixed update is mainly for built in physics
@@ -313,7 +317,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             if (!OnGround())
             {
-                if (jumpBuffer > 0 && CheckGrap()) Grap();
+                if (Input.GetButtonDown("Jump") && CheckGrap()) Grap();
                 if (CheckWallRun() && canWallRun && Input.GetButton("Jump")) StartWallRun();
             }
 
@@ -506,7 +510,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             grapDistance = grapHeightWorld - grapLocation.y;
 
-            if (grapDistance <= 2 && CheckGrapHeight()) // If the player is high enough to grapple, then return true
+            if (grapDistance <= 5 && CheckGrapHeight()) // If the player is high enough to grapple, then return true
                 return true;
         }
 
@@ -515,7 +519,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     private bool CheckGrapHeight()
     {
-        if (Physics.Raycast(transform.position, -Vector3.up, 5, groundMask.value)) return false;
+        if (Physics.Raycast(transform.position, -Vector3.up, 2, groundMask.value)) return false;
         return true;
     }
 
@@ -597,9 +601,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private bool CheckWallRun()
     {
         canWallRunLeft = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.left),
-            out leftWallData, 2f, vaultMask.value);
+            out leftWallData, 3f, vaultMask.value);
         canWallRunRight = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right),
-            out rightWallData, 2f, vaultMask.value);
+            out rightWallData, 3f, vaultMask.value);
 
         // Makes sure the player hasnt gone around a wall
         wallRunNormal = canWallRunRight ? rightWallData.normal : leftWallData.normal;
@@ -727,9 +731,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     private IEnumerator Powerup_SpeedBoost() // Doubles the players speed for 5 seconds
     {
-        walkSpeed *= 2;
+        walkSpeed += defaultWalkSpeed;
         yield return new WaitForSeconds(5);
-        walkSpeed /= 2;
+        walkSpeed -= defaultWalkSpeed;
     }
 
     private IEnumerator Powerup_JumpBoost() // Increases the players jump height for 5 seconds
