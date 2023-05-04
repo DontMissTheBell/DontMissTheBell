@@ -314,7 +314,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             if (!OnGround())
             {
                 if (jumpBuffer > 0 && CheckGrap()) Grap();
-                if (CheckWallRun() && canWallRun) StartWallRun();
+                if (CheckWallRun() && canWallRun && Input.GetButton("Jump")) StartWallRun();
             }
 
             if (controller.isGrounded) //
