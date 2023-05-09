@@ -66,7 +66,6 @@ public class Globals : MonoBehaviour
         // Reset level-relative variables
         gamePaused = false;
         levelComplete = false;
-        replayToStart = "";
 
         if (sceneId >= 0)
         {
