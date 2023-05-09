@@ -1,10 +1,14 @@
 using UnityEngine;
+using UnityEngine.UI;
+using DG.Tweening;
 
 public class PauseMenu : MonoBehaviour
 {
+    public GameObject panel;    
     // Start is called before the first frame update
     private void Start()
     {
+        panel.SetActive(false);
     }
 
     // Update is called once per frame
@@ -19,7 +23,25 @@ public class PauseMenu : MonoBehaviour
             if (Time.timeScale == 1.0f)
                 Cursor.lockState = CursorLockMode.Locked;
             else
-                Cursor.lockState = CursorLockMode.None; 
+                Cursor.lockState = CursorLockMode.None;
+            panel.SetActive(true);
+            
+            
         }
+
+        if (Time.timeScale == 1.0f)
+        {
+            panel.SetActive(false);
+        }
+            
     }
+    public void resumE()
+    {
+        Globals.Instance.gameResumed = 1.0f == Time.timeScale;
+        panel.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+        Time.timeScale = 1.0f;
+        gameObject.GetComponentInChildren<Canvas>(false).enabled = 0.0f == Time.timeScale;
+    }
+    
 }

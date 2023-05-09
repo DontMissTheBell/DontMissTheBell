@@ -15,6 +15,7 @@ public class Globals : MonoBehaviour
     // Global variables
     public bool gamePaused;
     public bool levelComplete;
+    public bool gameResumed;
 
     public bool cutsceneActive;
 
@@ -48,6 +49,7 @@ public class Globals : MonoBehaviour
         loadingScreen = GameObject.FindGameObjectWithTag("LoadingScreen").GetComponent<RectTransform>();
 
         gamePaused = 0.0f == Time.timeScale;
+        gameResumed = 1.0f == Time.timeScale;
     }
 
     // Transition manager
