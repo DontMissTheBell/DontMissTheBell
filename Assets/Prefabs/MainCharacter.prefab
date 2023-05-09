@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 629006821951210352}
   - component: {fileID: 2085628573073146043}
   - component: {fileID: 6207653251644604308}
-  - component: {fileID: 1495129359}
+  - component: {fileID: 8832561948275347605}
   m_Layer: 0
   m_Name: MainCharacter
   m_TagString: Untagged
@@ -38,7 +38,7 @@ Transform:
   - {fileID: 629006823114628732}
   - {fileID: 7518147800877897173}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &629006821951210366
 CharacterController:
@@ -81,7 +81,7 @@ MonoBehaviour:
   controller: {fileID: 629006821951210366}
   playerCamera: {fileID: 629006822316553101}
   health: 50
-  defaultWalkSpeed: 0
+  defaultWalkSpeed: 10
   sprintSpeed: 2
   gravity: -40
   ySpeed: 0
@@ -257,7 +257,7 @@ SkinnedMeshRenderer:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
   m_DirtyAABB: 0
---- !u!114 &1495129359
+--- !u!114 &8832561948275347605
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
