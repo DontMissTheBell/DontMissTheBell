@@ -8,6 +8,8 @@ public class Cutscene : MonoBehaviour
     [SerializeField] DialogueMain Dialogue; 
     [SerializeField] Camera CutsceneCamera;
 
+    [SerializeField] GameObject TimerObject;
+
     public bool writingDialogue;
     
 
@@ -15,6 +17,8 @@ public class Cutscene : MonoBehaviour
     void Start()
     {
         Globals.Instance.cutsceneActive = true;
+
+        TimerObject.SetActive(false);
 
         StartCoroutine(StartCutscene());
         
@@ -38,6 +42,8 @@ public class Cutscene : MonoBehaviour
         Dialogue.gameObject.SetActive(false);
 
         CutsceneCamera.enabled = false;
+
+        TimerObject.SetActive(true);
     }
 
 }
