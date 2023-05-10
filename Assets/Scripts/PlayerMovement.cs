@@ -332,7 +332,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 }
 
                 if (!Input.GetKey(KeyCode.F))
-                    if (isCrouching && !Physics.Raycast(transform.position, Vector3.up, 2, vaultMask.value))
+                    if (isCrouching && !Physics.CheckSphere(transform.position + (Vector3.up*2),0.5f))
                         EndCrouch();
             }
         }

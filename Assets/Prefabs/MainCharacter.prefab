@@ -102,9 +102,9 @@ MonoBehaviour:
   slideDuration: 1.5
   damageTint: {fileID: 0}
   maxFallHeight: -20
-  wallJumpForce: 20
+  wallJumpForce: 15
   wallJumpTimeMax: 0.5
-  wallRunSpeed: 15
+  wallRunSpeed: 10
   wallJumpDelay: 0.05
   wallRunTiltMax: 7.5
   grapJumpDelay: 0.1
