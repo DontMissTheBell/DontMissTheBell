@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     public Transform groundCheck; // creates an input in unity we can put our epty ground check object into
     public float groundDistance = 0.4f; // will be used later to make the sphere check for 0.4 towards the ground
-    public LayerMask groundMask, vaultMask; // a layer mask is in unity and is just a layer you can create
+    public LayerMask groundMask, vaultMask, uncrouchMask; // a layer mask is in unity and is just a layer you can create
 
 
     [Header("Dodge")] [SerializeField] private float dodgeDuration;
@@ -332,7 +332,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 }
 
                 if (!Input.GetKey(KeyCode.F))
-                    if (isCrouching && !Physics.CheckSphere(transform.position + (Vector3.up*2),0.5f))
+                    if (isCrouching && !Physics.CheckCapsule(transform.position, transform.position + (Vector3.up*2),0.5f, ~uncrouchMask))
                         EndCrouch();
             }
         }

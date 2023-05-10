@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 629006821951210352}
   - component: {fileID: 2085628573073146043}
   - component: {fileID: 6207653251644604308}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: MainCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,6 +93,9 @@ MonoBehaviour:
   vaultMask:
     serializedVersion: 2
     m_Bits: 128
+  uncrouchMask:
+    serializedVersion: 2
+    m_Bits: 512
   dodgeDuration: 0.35
   dodgePower: 3
   mcJumpHeight: 10
