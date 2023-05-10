@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 629006821951210352}
   - component: {fileID: 2085628573073146043}
   - component: {fileID: 6207653251644604308}
-  - component: {fileID: 8832561948275347605}
   m_Layer: 0
   m_Name: MainCharacter
   m_TagString: Untagged
@@ -81,7 +80,7 @@ MonoBehaviour:
   controller: {fileID: 629006821951210366}
   playerCamera: {fileID: 629006822316553101}
   health: 50
-  defaultWalkSpeed: 10
+  walkSpeed: 10
   sprintSpeed: 2
   gravity: -40
   ySpeed: 0
@@ -257,18 +256,6 @@ SkinnedMeshRenderer:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
   m_DirtyAABB: 0
---- !u!114 &8832561948275347605
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 629006821951210364}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21bb9f56895633a45bd14026294b3211, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &629006822164453823
 GameObject:
   m_ObjectHideFlags: 0
@@ -5124,15 +5111,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 629006822316553099}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.01945827, y: -0, z: -0, w: 0.9998107}
+  m_LocalPosition: {x: 0, y: 0.26, z: 0.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 629006822164453808}
   m_Father: {fileID: 629006821951210367}
   m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 2.23, y: 0, z: 0}
 --- !u!20 &629006822316553101
 Camera:
   m_ObjectHideFlags: 0
@@ -5143,7 +5130,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -5164,9 +5151,9 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.35
   far clip plane: 1000
-  field of view: 75
+  field of view: 70
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -5310,16 +5297,28 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e8d79e5e6c4872942ad605613f581539, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.1414
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e8d79e5e6c4872942ad605613f581539, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.1414
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e8d79e5e6c4872942ad605613f581539, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.1414
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e8d79e5e6c4872942ad605613f581539, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.00026703
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e8d79e5e6c4872942ad605613f581539, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.6
+      value: -1.626
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e8d79e5e6c4872942ad605613f581539, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.051
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e8d79e5e6c4872942ad605613f581539, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5352,6 +5351,14 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: e8d79e5e6c4872942ad605613f581539, type: 3}
       propertyPath: m_Name
       value: main char
+      objectReference: {fileID: 0}
+    - target: {fileID: 4150033589033872475, guid: e8d79e5e6c4872942ad605613f581539, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4150033589033872475, guid: e8d79e5e6c4872942ad605613f581539, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.231
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: e8d79e5e6c4872942ad605613f581539, type: 3}
       propertyPath: m_Controller

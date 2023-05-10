@@ -5,15 +5,21 @@ using UnityEngine.UI;
 
 public class HUDlayout : MonoBehaviour
 {
+    public Objectives script;
     
     public GameObject HomeworkIcon;
     public GameObject SpeedBoostIcon;
     public GameObject JumpBoostIcon;
+    
 
     // Start is called before the first frame update
     void Start()
     {
-        //HomeworkIcon.SetActive(false);
+       
+
+        HomeworkIcon.SetActive(false);
+        SpeedBoostIcon.SetActive(false);
+        JumpBoostIcon.SetActive(false);
         //SpeedBoostIcon.SetActive(false);
         //JumpBoostIcon.SetActive(false);
     }
@@ -21,14 +27,20 @@ public class HUDlayout : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        SetEnabled();
     }
 
-    //public void SetEnabled(bool HomeworkIcon)
-    //{
-    //    if (homeworkCompleted)
-    //    {
-    //        HomeworkIcon.SetActive(true);
-    //    }
-    //}
+    public void SetEnabled()
+    {
+        if (script.homeworkCompleted)
+        {
+            HomeworkIcon.SetActive(true);
+        }
+        else
+        {
+            HomeworkIcon.SetActive(false);
+        }
+
+
+    }
 }
