@@ -11,13 +11,14 @@ public class Cutscene : MonoBehaviour
     [SerializeField] GameObject TimerObject;
 
     public bool writingDialogue;
-    
 
 
-    void Start()
+    void Awake()
     {
         Globals.Instance.cutsceneActive = true;
-
+    }
+    void Start()
+    {
         TimerObject.SetActive(false);
 
         StartCoroutine(StartCutscene());
@@ -37,7 +38,7 @@ public class Cutscene : MonoBehaviour
             }
 
         }
-        Globals.Instance.cutsceneActive = false;
+        Globals.Instance.EndCutscene();
 
         Dialogue.gameObject.SetActive(false);
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
@@ -18,8 +19,10 @@ public class Globals : MonoBehaviour
     public bool gameResumed;
 
     public bool cutsceneActive;
+    public event EventHandler CutsceneOver;
 
     public string replayToStart;
+
 
     // Loading screen
     private RectTransform loadingScreen;
@@ -50,6 +53,12 @@ public class Globals : MonoBehaviour
 
         gamePaused = 0.0f == Time.timeScale;
         gameResumed = 1.0f == Time.timeScale;
+    }
+
+    public void EndCutscene()
+    {
+        cutsceneActive = false;
+        CutsceneOver?.Invoke(this, EventArgs.Empty);
     }
 
     // Transition manager

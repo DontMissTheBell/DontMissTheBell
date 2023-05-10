@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Net;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -48,7 +47,9 @@ public class GhostManager : MonoBehaviour
             Globals.Instance.replayToStart = "";
         }
 
-        if (shouldRecord)
+        if (Globals.Instance.cutsceneActive)
+            Globals.Instance.CutsceneOver += HandleCutsceneOverEvent;
+        else if (shouldRecord)
             SetupRecording();
         else if (shouldReplay) SetupReplay();
     }
@@ -106,17 +107,17 @@ public class GhostManager : MonoBehaviour
             {
                 // Stop when we reach the end of the replay
                 case true when currentFrameIndex + 1 != replayLength:
-                {
-                    // Set player transform to data in current frame
-                    replayFrames[currentFrameIndex].ExportTransform(transform);
-                    // Update ideal camera rotation
-                    if (replayFrames[currentFrameIndex].hasCameraTransform)
-                        idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
-                    //Debug.Log(idealCameraRotation);
-                    // We need to move on to the next frame's data
-                    currentFrameIndex++;
-                    break;
-                }
+                    {
+                        // Set player transform to data in current frame
+                        replayFrames[currentFrameIndex].ExportTransform(transform);
+                        // Update ideal camera rotation
+                        if (replayFrames[currentFrameIndex].hasCameraTransform)
+                            idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
+                        //Debug.Log(idealCameraRotation);
+                        // We need to move on to the next frame's data
+                        currentFrameIndex++;
+                        break;
+                    }
                 case true:
                     playbackBegun = false;
                     LevelCompleteEvent?.Invoke();
@@ -136,8 +137,13 @@ public class GhostManager : MonoBehaviour
         Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
     }
 
+    private void HandleCutsceneOverEvent(object sender, EventArgs e)
+    {
+        SetupRecording();
+    }
     private void SetupRecording()
     {
+        Debug.Log("starting to record");
         ghostData = new MemoryStream();
         dataWriter = new BinaryWriter(ghostData);
         currentlyRecording = true;
