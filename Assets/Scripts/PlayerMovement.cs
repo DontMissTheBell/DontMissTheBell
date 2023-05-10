@@ -360,7 +360,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             if (slideTime >= 0.1f && !Input.GetKey(KeyCode.F))
             {
-                if (!Physics.Raycast(transform.position, Vector3.up, 2, vaultMask.value))
+                if (!Physics.CheckCapsule(transform.position, transform.position + (Vector3.up*2),0.5f, ~uncrouchMask))
                 {
                     EndCrouch();
                     EndSlide();
@@ -373,7 +373,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             if (slideTime >= slideDuration)
             {
-                if (!Input.GetKey(KeyCode.F) && !Physics.Raycast(transform.position, Vector3.up, 2, vaultMask.value))
+                if (!Input.GetKey(KeyCode.F) && !Physics.CheckCapsule(transform.position, transform.position + (Vector3.up*2),0.5f, ~uncrouchMask))
                 {
                     EndCrouch();
                     EndSlide();
