@@ -20,28 +20,9 @@ public class PauseMenu : MonoBehaviour
             Time.timeScale = 1.0f - Time.timeScale;
             Globals.Instance.gamePaused = 0.0f == Time.timeScale;
             gameObject.GetComponentInChildren<Canvas>(true).enabled = 0.0f == Time.timeScale;
-            if (Time.timeScale == 1.0f)
-                Cursor.lockState = CursorLockMode.Locked;
-            else
-                Cursor.lockState = CursorLockMode.None;
-            panel.SetActive(true);
-            
-            
-        }
-
-        if (Time.timeScale == 1.0f)
-        {
-            panel.SetActive(false);
+            Cursor.lockState = Globals.Instance.gamePaused ? CursorLockMode.None : CursorLockMode.Locked;
+            panel.SetActive(Globals.Instance.gamePaused);
         }
             
     }
-    public void resumE()
-    {
-        Globals.Instance.gameResumed = 1.0f == Time.timeScale;
-        panel.SetActive(false);
-        Cursor.lockState = CursorLockMode.Locked;
-        Time.timeScale = 1.0f;
-        gameObject.GetComponentInChildren<Canvas>(false).enabled = 0.0f == Time.timeScale;
-    }
-    
 }

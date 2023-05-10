@@ -93,14 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e77536e354b0c034dbe98f19372b0929, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  delay: 0.025
-  input: My mum (82F) told me (12M) to do the dishes (16) but I (12M) was too busy
-    playing Fortnite (3 kills) so I (12M) grabbed my controller (DualShock 4) and
-    threw it at her (138kph). She fucking died, and I (12M) went to prison (18 years).
-    While in prison I (12M) incited several riots (3) and assumed leadership of a
-    gang responsible for smuggling drugs (cocaine) into the country. I (12M) also
-    ordered the assassination of several celebrities (Michael Jackson, Elvis Presley
-    and Jeffrey Epstein) and planned a terrorist attack (9/11). Reddit, AITA?
+  Avatar: {fileID: 0}
 --- !u!1 &6956368324867108859
 GameObject:
   m_ObjectHideFlags: 0
@@ -328,10 +321,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
