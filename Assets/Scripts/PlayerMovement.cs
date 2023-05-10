@@ -49,6 +49,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     [Header("Roll")] [SerializeField] private Image damageTint;
 
+    [SerializeField] private float maxFallHeight;
+
 
     [Header("Wall Run")] [SerializeField] private float wallJumpForce;
 
@@ -266,7 +268,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             if (!controller.isGrounded) playerOnGround = false;
             if (controller.isGrounded && !playerOnGround)
             {
-                if (ySpeed <= -25f) // If the player falls from high enough to need to roll
+                if (ySpeed <= maxFallHeight) // If the player falls from high enough to need to roll
                 {
                     if (Input.GetKey(KeyCode.F))
                         StartCoroutine(Roll());
@@ -542,7 +544,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         controller.height = 1;
         controller.center = new Vector3(0, -0.5f, 0);
 
-        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y - 0.5f, 0.1f)
+        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y - 0.75f, 0.1f)
             .SetEase(Ease.InOutSine);
     }
 
@@ -555,7 +557,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         controller.height = 2;
         controller.center = new Vector3(0, 0, 0);
 
-        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y + 0.5f, 0.1f)
+        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y + 0.75f, 0.1f)
             .SetEase(Ease.InOutSine);
     }
 

@@ -80,9 +80,9 @@ MonoBehaviour:
   controller: {fileID: 629006821951210366}
   playerCamera: {fileID: 629006822316553101}
   health: 50
-  walkSpeed: 10
-  sprintSpeed: 2
-  gravity: -40
+  defaultWalkSpeed: 10
+  sprintSpeed: 1.75
+  gravity: -35
   ySpeed: 0
   powerupParticle: {fileID: 629006822164453823}
   groundCheck: {fileID: 629006823114628732}
@@ -95,12 +95,13 @@ MonoBehaviour:
     m_Bits: 128
   dodgeDuration: 0.35
   dodgePower: 3
-  mcJumpHeight: 15
-  jumpBufferMax: 0.1
+  mcJumpHeight: 10
+  jumpBufferMax: 0.05
   coyoteTime: 0.2
   slidePower: 30
   slideDuration: 1.5
   damageTint: {fileID: 0}
+  maxFallHeight: -20
   wallJumpForce: 20
   wallJumpTimeMax: 0.5
   wallRunSpeed: 15
