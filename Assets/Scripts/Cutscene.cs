@@ -15,14 +15,18 @@ public class Cutscene : MonoBehaviour
 
     void Awake()
     {
-        Globals.Instance.cutsceneActive = true;
+        if (string.IsNullOrEmpty(Globals.Instance.replayToStart))
+        {
+            Globals.Instance.cutsceneActive = true;
+        }
     }
     void Start()
     {
-        TimerObject.SetActive(false);
-
-        StartCoroutine(StartCutscene());
-        
+        if (Globals.Instance.cutsceneActive)
+        {
+            TimerObject.SetActive(false);
+            StartCoroutine(StartCutscene());
+        }
     }
 
     private IEnumerator StartCutscene()
