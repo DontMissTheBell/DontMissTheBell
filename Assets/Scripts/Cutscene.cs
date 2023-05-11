@@ -27,6 +27,14 @@ public class Cutscene : MonoBehaviour
             TimerObject.SetActive(false);
             StartCoroutine(StartCutscene());
         }
+        else
+        {
+            Dialogue.gameObject.SetActive(false);
+
+            CutsceneCamera.enabled = false;
+
+            TimerObject.SetActive(true);
+        }
     }
 
     private IEnumerator StartCutscene()
