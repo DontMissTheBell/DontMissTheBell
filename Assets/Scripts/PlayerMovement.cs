@@ -270,7 +270,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             {
                 if (ySpeed <= maxFallHeight) // If the player falls from high enough to need to roll
                 {
-                    if (Input.GetKey(KeyCode.F))
+                    if (Input.GetKey(KeyCode.C))
                         StartCoroutine(Roll());
                     else
                         FailRoll();
@@ -325,13 +325,13 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             if (controller.isGrounded) //
             {
-                if (Input.GetKey(KeyCode.F) && crouchDelay <= 0 && !isCrouching)
+                if (Input.GetKey(KeyCode.C) && crouchDelay <= 0 && !isCrouching)
                 {
                     if (isSprinting) StartSlide(transform.forward * slidePower + transform.position);
                     StartCrouch();
                 }
 
-                if (!Input.GetKey(KeyCode.F))
+                if (!Input.GetKey(KeyCode.C))
                     if (isCrouching && !Physics.CheckCapsule(transform.position, transform.position + (Vector3.up*2),0.5f, ~uncrouchMask))
                         EndCrouch();
             }
@@ -358,7 +358,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             controller.Move(slideDirection * Time.deltaTime * Mathf.Lerp(slidePower, 1, t));
 
-            if (slideTime >= 0.1f && !Input.GetKey(KeyCode.F))
+            if (slideTime >= 0.1f && !Input.GetKey(KeyCode.C))
             {
                 if (!Physics.CheckCapsule(transform.position, transform.position + (Vector3.up*2),0.5f, ~uncrouchMask))
                 {
@@ -373,7 +373,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             if (slideTime >= slideDuration)
             {
-                if (!Input.GetKey(KeyCode.F) && !Physics.CheckCapsule(transform.position, transform.position + (Vector3.up*2),0.5f, ~uncrouchMask))
+                if (!Input.GetKey(KeyCode.C) && !Physics.CheckCapsule(transform.position, transform.position + (Vector3.up*2),0.5f, ~uncrouchMask))
                 {
                     EndCrouch();
                     EndSlide();
