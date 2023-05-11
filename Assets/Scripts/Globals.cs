@@ -1,5 +1,6 @@
-using System.Collections;
 using DG.Tweening;
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,15 +16,25 @@ public class Globals : MonoBehaviour
     // Global variables
     public bool gamePaused;
     public bool levelComplete;
-    public bool gameResumed;
+
+    public int playerID;
+    public Guid playerSecret;
+
+    public static string Username
+    {
+        get => PlayerPrefs.GetString("username");
+        set => PlayerPrefs.SetString("username", value);
+    }
 
     public bool cutsceneActive;
+    public event EventHandler CutsceneOver;
 
     public string replayToStart;
 
+
     // Loading screen
     private RectTransform loadingScreen;
-    public string APIEndpoint => devAPI ? "http://localhost:8080/api" : "https://dmtb.catpowered.net/api";
+    public string APIEndpoint => devAPI ? "http://localhost:8080/api" : "https://api.catpowered.net/dmtb";
 
     public static Globals Instance
     {
@@ -49,12 +60,32 @@ public class Globals : MonoBehaviour
         loadingScreen = GameObject.FindGameObjectWithTag("LoadingScreen").GetComponent<RectTransform>();
 
         gamePaused = 0.0f == Time.timeScale;
-        gameResumed = 1.0f == Time.timeScale;
+        if (!PlayerPrefs.HasKey("player_id") || !PlayerPrefs.HasKey("player_secret"))
+        {
+            // Generate a random player ID on first run
+            playerID = new System.Random().Next();
+            PlayerPrefs.SetInt("player_id", playerID);
+            playerSecret = Guid.NewGuid();
+            PlayerPrefs.SetString("player_secret", playerSecret.ToString());
+        }
+        else
+        {
+            playerID = PlayerPrefs.GetInt("player_id");
+            playerSecret = new Guid(PlayerPrefs.GetString("player_secret"));
+        }
+
+    }
+
+    public void EndCutscene()
+    {
+        cutsceneActive = false;
+        CutsceneOver?.Invoke(this, EventArgs.Empty);
     }
 
     // Transition manager
     public IEnumerator TriggerLoadingScreen(string sceneName = "", int sceneId = -1)
     {
+        cutsceneActive = false;
         // Start animation
         loadingScreen.DORotate(Vector3.zero, LoadDuration);
         yield return new WaitForSeconds(LoadDuration);
@@ -69,12 +100,7 @@ public class Globals : MonoBehaviour
 
         if (sceneId >= 0)
         {
-            // Convert BuildIndex (levelId) to scene name
-            sceneName = SceneUtility.GetScenePathByBuildIndex(sceneId);
-            var slashLocation = sceneName.LastIndexOf('/');
-            sceneName = sceneName[slashLocation..];
-            var dotLocation = sceneName.LastIndexOf('.');
-            sceneName = sceneName[..dotLocation];
+            sceneName = GetSceneNameFromId(sceneId);
             SceneManager.LoadSceneAsync(sceneId);
         }
         else
@@ -92,5 +118,14 @@ public class Globals : MonoBehaviour
         // Finish animation
         yield return new WaitForSeconds(0.25f);
         loadingScreen.DORotate(Vector3.left * 90, LoadDuration);
+    }
+
+    public static string GetSceneNameFromId(int id)
+    {
+        var sceneName = SceneUtility.GetScenePathByBuildIndex(id);
+        var slashLocation = sceneName.LastIndexOf('/');
+        sceneName = sceneName[slashLocation..];
+        var dotLocation = sceneName.LastIndexOf('.');
+        return sceneName[..dotLocation].TrimStart('/');
     }
 }

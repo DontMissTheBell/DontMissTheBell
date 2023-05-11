@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Net;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -48,7 +47,9 @@ public class GhostManager : MonoBehaviour
             Globals.Instance.replayToStart = "";
         }
 
-        if (shouldRecord)
+        if (Globals.Instance.cutsceneActive)
+            Globals.Instance.CutsceneOver += HandleCutsceneOverEvent;
+        else if (shouldRecord)
             SetupRecording();
         else if (shouldReplay) SetupReplay();
     }
@@ -106,17 +107,17 @@ public class GhostManager : MonoBehaviour
             {
                 // Stop when we reach the end of the replay
                 case true when currentFrameIndex + 1 != replayLength:
-                {
-                    // Set player transform to data in current frame
-                    replayFrames[currentFrameIndex].ExportTransform(transform);
-                    // Update ideal camera rotation
-                    if (replayFrames[currentFrameIndex].hasCameraTransform)
-                        idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
-                    //Debug.Log(idealCameraRotation);
-                    // We need to move on to the next frame's data
-                    currentFrameIndex++;
-                    break;
-                }
+                    {
+                        // Set player transform to data in current frame
+                        replayFrames[currentFrameIndex].ExportTransform(transform);
+                        // Update ideal camera rotation
+                        if (replayFrames[currentFrameIndex].hasCameraTransform)
+                            idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
+                        //Debug.Log(idealCameraRotation);
+                        // We need to move on to the next frame's data
+                        currentFrameIndex++;
+                        break;
+                    }
                 case true:
                     playbackBegun = false;
                     LevelCompleteEvent?.Invoke();
@@ -136,8 +137,13 @@ public class GhostManager : MonoBehaviour
         Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
     }
 
+    private void HandleCutsceneOverEvent(object sender, EventArgs e)
+    {
+        SetupRecording();
+    }
     private void SetupRecording()
     {
+        Debug.Log("Recording started!");
         ghostData = new MemoryStream();
         dataWriter = new BinaryWriter(ghostData);
         currentlyRecording = true;
@@ -158,6 +164,7 @@ public class GhostManager : MonoBehaviour
 
         using GZipStream compressor = new(compressedData, CompressionLevel.Optimal, true);
         uncompressedData.CopyTo(compressor);
+        compressor.Close();
 
         compressedData.Seek(0, SeekOrigin.Begin);
         return compressedData;
@@ -246,7 +253,7 @@ public class GhostManager : MonoBehaviour
         Debug.Log($"Final raw data size: {ghostData.Length / 1024}KB");
         compressedGhostData = Compress(ghostData);
         Debug.Log($"Final ghost size: {compressedGhostData.Length / 1024}KB");
-        StartCoroutine(UploadGhost(compressedGhostData.ToArray(), 0, SceneManager.GetActiveScene().buildIndex,
+        StartCoroutine(UploadGhost(compressedGhostData.ToArray(), Globals.Instance.playerID, SceneManager.GetActiveScene().buildIndex,
             replayLength));
     }
 
@@ -254,6 +261,7 @@ public class GhostManager : MonoBehaviour
     {
         var www = UnityWebRequest.Put($"{endpoint}/v1/submit-ghost", ghostData);
         www.SetRequestHeader("X-Player-Id", playerId.ToString());
+        www.SetRequestHeader("X-Player-Secret", Globals.Instance.playerSecret.ToString());
         www.SetRequestHeader("X-Level-Id", levelId.ToString());
         www.SetRequestHeader("X-Replay-Length", length.ToString());
         yield return www.SendWebRequest();

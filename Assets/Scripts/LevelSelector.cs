@@ -26,7 +26,7 @@ public class LevelSelector : MonoBehaviour
 
     public void StartGame()
     {
-        Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Level1"));
+        Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Level 1"));
     }
     public void BTmain()
     {
@@ -34,7 +34,7 @@ public class LevelSelector : MonoBehaviour
     }
     public void Test()
     {
-        Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Test"));
+        Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Test Area"));
     }
     public void Exit()
     {

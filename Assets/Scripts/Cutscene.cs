@@ -11,17 +11,30 @@ public class Cutscene : MonoBehaviour
     [SerializeField] GameObject TimerObject;
 
     public bool writingDialogue;
-    
 
 
+    void Awake()
+    {
+        if (string.IsNullOrEmpty(Globals.Instance.replayToStart))
+        {
+            Globals.Instance.cutsceneActive = true;
+        }
+    }
     void Start()
     {
-        Globals.Instance.cutsceneActive = true;
+        if (Globals.Instance.cutsceneActive)
+        {
+            TimerObject.SetActive(false);
+            StartCoroutine(StartCutscene());
+        }
+        else
+        {
+            Dialogue.gameObject.SetActive(false);
 
-        TimerObject.SetActive(false);
+            CutsceneCamera.enabled = false;
 
-        StartCoroutine(StartCutscene());
-        
+            TimerObject.SetActive(true);
+        }
     }
 
     private IEnumerator StartCutscene()
@@ -37,7 +50,7 @@ public class Cutscene : MonoBehaviour
             }
 
         }
-        Globals.Instance.cutsceneActive = false;
+        Globals.Instance.EndCutscene();
 
         Dialogue.gameObject.SetActive(false);
 

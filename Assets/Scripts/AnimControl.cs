@@ -4,14 +4,7 @@ using UnityEngine;
 
 public class AnimControl : MonoBehaviour
 {
-    Animator animator;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        animator = GetComponent<Animator>();
-
-    }
+    public Animator animator;
 
     // Update is called once per frame
     void Update()
