@@ -23,6 +23,7 @@ public class GhostManager : MonoBehaviour
 
     // Enable this to playback a ghost recording (DEBUG)
     public bool shouldReplay;
+    public bool shouldPlayCutscene;
     public string ghostID;
     private MemoryStream compressedGhostData;
     private bool currentlyRecording, playbackBegun, ghostDownloaded;
@@ -43,6 +44,7 @@ public class GhostManager : MonoBehaviour
         {
             shouldRecord = false;
             shouldReplay = true;
+            shouldPlayCutscene = false;
             ghostID = Globals.Instance.replayToStart;
             Globals.Instance.replayToStart = "";
         }
@@ -134,7 +136,7 @@ public class GhostManager : MonoBehaviour
         shouldReplay = false;
         Globals.Instance.levelComplete = true;
         Thread.Sleep(1000);
-        Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
+        Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen(shouldPlayCutscene ? "EndCutscene" : "Main Menu"));
     }
 
     private void HandleCutsceneOverEvent(object sender, EventArgs e)
