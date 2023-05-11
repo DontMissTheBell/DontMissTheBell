@@ -26,17 +26,17 @@ public class Cutscene : MonoBehaviour
     {
         if (Globals.Instance.cutsceneActive)
         {
-            if (Globals.Instance.levelComplete)
+            if (Globals.Instance.runningLate)
             {
-                Dialogue = Dialogue1;
-                StartCoroutine(StartCutscene());
+                Dialogue = Dialogue2;
             }
             else
             {
-                Dialogue = Dialogue2;
-                TimerObject.SetActive(false);
-                StartCoroutine(StartCutscene());
+                Dialogue = Dialogue1;
             }
+            Dialogue.gameObject.SetActive(true);
+            TimerObject.SetActive(false);
+            StartCoroutine(StartCutscene()); 
         }
         else
         {
@@ -68,6 +68,11 @@ public class Cutscene : MonoBehaviour
         CutsceneCamera.enabled = false;
 
         TimerObject.SetActive(true);
+
+        if (Globals.Instance.levelComplete)
+        {
+            Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
+        }
     }
 
 }
