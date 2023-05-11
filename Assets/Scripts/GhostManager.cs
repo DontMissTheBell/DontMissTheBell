@@ -260,6 +260,7 @@ public class GhostManager : MonoBehaviour
     {
         var www = UnityWebRequest.Put($"{endpoint}/v1/submit-ghost", ghostData);
         www.SetRequestHeader("X-Player-Id", playerId.ToString());
+        www.SetRequestHeader("X-Player-Secret", Globals.Instance.playerSecret.ToString());
         www.SetRequestHeader("X-Level-Id", levelId.ToString());
         www.SetRequestHeader("X-Replay-Length", length.ToString());
         yield return www.SendWebRequest();

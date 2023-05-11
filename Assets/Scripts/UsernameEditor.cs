@@ -20,6 +20,7 @@ public class UsernameEditor : MonoBehaviour
     {
         var www = UnityWebRequest.Put($"{Globals.Instance.APIEndpoint}/v1/update-username", Globals.Username);
         www.SetRequestHeader("X-Player-Id", Globals.Instance.playerID.ToString());
+        www.SetRequestHeader("X-Player-Secret", Globals.Instance.playerSecret.ToString());
         yield return www.SendWebRequest();
 
         Debug.Log(www.result != UnityWebRequest.Result.Success

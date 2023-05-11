@@ -18,6 +18,7 @@ public class Globals : MonoBehaviour
     public bool levelComplete;
 
     public int playerID;
+    public Guid playerSecret;
 
     public static string Username
     {
@@ -64,11 +65,13 @@ public class Globals : MonoBehaviour
             // Generate a random player ID on first run
             playerID = new System.Random().Next();
             PlayerPrefs.SetInt("player_id", playerID);
+            playerSecret = Guid.NewGuid();
+            PlayerPrefs.SetString("player_secret", playerSecret.ToString());
         }
         else
         {
             playerID = PlayerPrefs.GetInt("player_id");
-            Username = PlayerPrefs.GetString("username");
+            playerSecret = new Guid(PlayerPrefs.GetString("player_secret"));
         }
 
     }
