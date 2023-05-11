@@ -98,7 +98,10 @@ public class Globals : MonoBehaviour
         // Reset level-relative variables
         gamePaused = false;
         levelComplete = false;
-        runningLate = false;
+        if (sceneName != "EndCutscene")
+        {
+            runningLate = false;
+        }
 
         if (sceneId >= 0)
         {
