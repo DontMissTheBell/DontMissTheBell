@@ -2341,7 +2341,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 556065048}
-  m_LocalRotation: {x: -0.022958905, y: -0.005614591, z: -0.00012894088, w: 0.9997207}
+  m_LocalRotation: {x: -0.022958905, y: -0.00561459, z: -0.00012894085, w: 0.9997207}
   m_LocalPosition: {x: 399.19775, y: 499.00946, z: -949.68866}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3129,7 +3129,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 732056968}
-  m_LocalRotation: {x: -0.034076538, y: 0.00072419824, z: 0.000024692514, w: 0.999419}
+  m_LocalRotation: {x: -0.034076553, y: 0.0007241926, z: 0.000024692332, w: 0.999419}
   m_LocalPosition: {x: -51.820343, y: 66, z: -32.01581}
   m_LocalScale: {x: 2.9185, y: 2.9185, z: 17.277813}
   m_ConstrainProportionsScale: 0
@@ -3316,7 +3316,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 771803004}
-  m_LocalRotation: {x: -0.020325668, y: 0.0041924394, z: 0.00008523249, w: 0.99978465}
+  m_LocalRotation: {x: -0.020325726, y: 0.004192499, z: 0.00008523396, w: 0.99978465}
   m_LocalPosition: {x: 1505.4669, y: 500.00946, z: -957.7119}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4938,7 +4938,7 @@ MonoBehaviour:
         m_MethodName: UpdateCamera
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 771803005}
+          m_ObjectArgument: {fileID: 1020695694}
           m_ObjectArgumentAssemblyTypeName: Cinemachine.CinemachineVirtualCamera,
             Cinemachine
           m_IntArgument: 0
@@ -6824,6 +6824,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 426842530}
     m_Modifications:
+    - target: {fileID: 8338236626899468365, guid: ef2a4f131f122984b98a609f2c93fce8, type: 3}
+      propertyPath: m_Name
+      value: Streetlamp
+      objectReference: {fileID: 0}
     - target: {fileID: 8717999815282055927, guid: ef2a4f131f122984b98a609f2c93fce8, type: 3}
       propertyPath: m_RootOrder
       value: -1
@@ -6883,10 +6887,6 @@ PrefabInstance:
     - target: {fileID: 8717999815282055927, guid: ef2a4f131f122984b98a609f2c93fce8, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8338236626899468365, guid: ef2a4f131f122984b98a609f2c93fce8, type: 3}
-      propertyPath: m_Name
-      value: Streetlamp
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7120,7 +7120,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1463146327}
-  m_LocalRotation: {x: -0.034076538, y: 0.00072419824, z: 0.000024692514, w: 0.999419}
+  m_LocalRotation: {x: -0.034076553, y: 0.0007241926, z: 0.000024692332, w: 0.999419}
   m_LocalPosition: {x: -208.2, y: 499.00946, z: -986.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -8175,6 +8175,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 426842530}
     m_Modifications:
+    - target: {fileID: 8338236626899468365, guid: ef2a4f131f122984b98a609f2c93fce8, type: 3}
+      propertyPath: m_Name
+      value: Streetlamp (1)
+      objectReference: {fileID: 0}
     - target: {fileID: 8717999815282055927, guid: ef2a4f131f122984b98a609f2c93fce8, type: 3}
       propertyPath: m_RootOrder
       value: -1
@@ -8234,10 +8238,6 @@ PrefabInstance:
     - target: {fileID: 8717999815282055927, guid: ef2a4f131f122984b98a609f2c93fce8, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8338236626899468365, guid: ef2a4f131f122984b98a609f2c93fce8, type: 3}
-      propertyPath: m_Name
-      value: Streetlamp (1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
