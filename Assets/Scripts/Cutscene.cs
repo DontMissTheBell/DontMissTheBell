@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Cutscene : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class Cutscene : MonoBehaviour
 
     [SerializeField] GameObject TimerObject;
 
+
     public bool writingDialogue;
 
 
@@ -21,21 +23,23 @@ public class Cutscene : MonoBehaviour
         {
             Globals.Instance.cutsceneActive = true;
         }
+
     }
     void Start()
     {
-        Dialogue = Globals.Instance.levelComplete ? Dialogue1 : Dialogue2;
         if (Globals.Instance.cutsceneActive)
         {
-            if (Globals.Instance.levelComplete)
+            if (Globals.Instance.runningLate)
             {
-                StartCoroutine(StartCutscene());
+                Dialogue = Dialogue2;
             }
             else
             {
-                TimerObject.SetActive(false);
-                StartCoroutine(StartCutscene());
+                Dialogue = Dialogue1;
             }
+            Dialogue.gameObject.SetActive(true);
+            TimerObject.SetActive(false);
+            StartCoroutine(StartCutscene()); 
         }
         else
         {
@@ -67,6 +71,13 @@ public class Cutscene : MonoBehaviour
         CutsceneCamera.enabled = false;
 
         TimerObject.SetActive(true);
+
+
+
+        if (SceneManager.GetActiveScene().name == "EndCutscene")
+        {
+            Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu")); 
+        }
     }
 
 }

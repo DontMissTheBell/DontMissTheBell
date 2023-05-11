@@ -362,7 +362,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 018f15b7d7782b942b641f5614ebeb44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  delay: 0.025
+  delay: 0.015
   Cutscene: {fileID: 0}
   DialogueBoxes:
   - {fileID: 6956368324685598691}
