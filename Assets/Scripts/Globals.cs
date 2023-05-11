@@ -60,7 +60,7 @@ public class Globals : MonoBehaviour
         loadingScreen = GameObject.FindGameObjectWithTag("LoadingScreen").GetComponent<RectTransform>();
 
         gamePaused = 0.0f == Time.timeScale;
-        if (!PlayerPrefs.HasKey("player_id"))
+        if (!PlayerPrefs.HasKey("player_id") || !PlayerPrefs.HasKey("player_secret"))
         {
             // Generate a random player ID on first run
             playerID = new System.Random().Next();

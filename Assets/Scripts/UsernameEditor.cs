@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -12,7 +13,7 @@ public class UsernameEditor : MonoBehaviour
     {
         // Do nothing if name blank
         if (string.IsNullOrWhiteSpace(usernameBox.text)) return;
-        Globals.Username = usernameBox.text;
+        Globals.Username = usernameBox.text.Replace(" ", string.Empty);
         StartCoroutine(UploadUsername());
     }
 
