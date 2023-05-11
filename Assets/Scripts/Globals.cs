@@ -16,6 +16,7 @@ public class Globals : MonoBehaviour
     // Global variables
     public bool gamePaused;
     public bool levelComplete;
+    public bool runningLate;
 
     public int playerID;
     public Guid playerSecret;
@@ -97,6 +98,7 @@ public class Globals : MonoBehaviour
         // Reset level-relative variables
         gamePaused = false;
         levelComplete = false;
+        runningLate = false;
 
         if (sceneId >= 0)
         {
