@@ -43,8 +43,6 @@ public class Cutscene : MonoBehaviour
         }
         else
         {
-            Dialogue.gameObject.SetActive(false);
-
             CutsceneCamera.enabled = false;
 
             TimerObject.SetActive(true);
