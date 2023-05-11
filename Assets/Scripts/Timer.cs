@@ -20,7 +20,7 @@ public class Timer : MonoBehaviour
                 Globals.Instance.runningLate = true;
             }
 
-            timerText.text = currentTime >= minuteLimit * 60 ? currentTime.ToString("F2") : "Late";
+            timerText.text = currentTime >= minuteLimit * 60 ? "Late" : currentTime.ToString("F2");
         }
     }
 }
