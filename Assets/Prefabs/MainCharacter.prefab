@@ -36,7 +36,7 @@ Transform:
   - {fileID: 629006823114628732}
   - {fileID: 3337691066747877500}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &629006821951210366
 CharacterController:
@@ -297,7 +297,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.21
+  near clip plane: 0.19
   far clip plane: 1000
   field of view: 70
   orthographic: 0
@@ -5273,7 +5273,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8779734002706592668, guid: 011db2f6c13d8d645bcead52bb59ed04, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.00026703
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8779734002706592668, guid: 011db2f6c13d8d645bcead52bb59ed04, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5281,7 +5281,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8779734002706592668, guid: 011db2f6c13d8d645bcead52bb59ed04, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.051
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8779734002706592668, guid: 011db2f6c13d8d645bcead52bb59ed04, type: 3}
       propertyPath: m_LocalRotation.w
