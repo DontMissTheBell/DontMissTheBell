@@ -52,7 +52,7 @@ public class ReplayBrowser : MonoBehaviour
 
             // Set label contents
             var entryText = currentEntry.GetComponentInChildren<TextMeshProUGUI>();
-            entryText.text = $"{usernameQueue.Dequeue()} - {leaderboardEntry.time} - {Globals.GetSceneNameFromId(leaderboardEntry.levelId)}";
+            entryText.text = $"{usernameQueue.Dequeue()} - {leaderboardEntry.time}s on {Globals.GetSceneNameFromId(leaderboardEntry.levelId)}";
 
             // Assign function call to Watch button
             var button = currentEntry.GetComponentInChildren<Button>();

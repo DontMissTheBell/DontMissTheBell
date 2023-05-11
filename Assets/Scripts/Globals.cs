@@ -82,6 +82,7 @@ public class Globals : MonoBehaviour
     // Transition manager
     public IEnumerator TriggerLoadingScreen(string sceneName = "", int sceneId = -1)
     {
+        cutsceneActive = false;
         // Start animation
         loadingScreen.DORotate(Vector3.zero, LoadDuration);
         yield return new WaitForSeconds(LoadDuration);
