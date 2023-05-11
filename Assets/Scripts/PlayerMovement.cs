@@ -314,7 +314,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 }
             }
 
-            if (Input.GetKey(KeyCode.V) && CheckVault()) Vault();
+            // Disabled because we don't use it in any level at the moment
+            // if (Input.GetKey(KeyCode.V) && CheckVault()) Vault();
 
 
             if (!OnGround())
