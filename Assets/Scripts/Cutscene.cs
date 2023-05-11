@@ -24,16 +24,15 @@ public class Cutscene : MonoBehaviour
     }
     void Start()
     {
+        Dialogue = Globals.Instance.levelComplete ? Dialogue1 : Dialogue2;
         if (Globals.Instance.cutsceneActive)
         {
             if (Globals.Instance.levelComplete)
             {
-                Dialogue = Dialogue1;
                 StartCoroutine(StartCutscene());
             }
             else
             {
-                Dialogue = Dialogue2;
                 TimerObject.SetActive(false);
                 StartCoroutine(StartCutscene());
             }
