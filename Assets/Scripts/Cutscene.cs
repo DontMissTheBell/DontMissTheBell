@@ -5,7 +5,9 @@ using UnityEngine;
 public class Cutscene : MonoBehaviour
 {
 
-    [SerializeField] DialogueMain Dialogue; 
+    DialogueMain Dialogue;
+    [SerializeField] DialogueMain Dialogue1; 
+    [SerializeField] DialogueMain Dialogue2; 
     [SerializeField] Camera CutsceneCamera;
 
     [SerializeField] GameObject TimerObject;
@@ -24,8 +26,17 @@ public class Cutscene : MonoBehaviour
     {
         if (Globals.Instance.cutsceneActive)
         {
-            TimerObject.SetActive(false);
-            StartCoroutine(StartCutscene());
+            if (Globals.Instance.levelComplete)
+            {
+                Dialogue = Dialogue1;
+                StartCoroutine(StartCutscene());
+            }
+            else
+            {
+                Dialogue = Dialogue2;
+                TimerObject.SetActive(false);
+                StartCoroutine(StartCutscene());
+            }
         }
         else
         {
