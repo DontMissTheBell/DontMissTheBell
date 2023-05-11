@@ -143,7 +143,7 @@ public class GhostManager : MonoBehaviour
     }
     private void SetupRecording()
     {
-        Debug.Log("starting to record");
+        Debug.Log("Recording started!");
         ghostData = new MemoryStream();
         dataWriter = new BinaryWriter(ghostData);
         currentlyRecording = true;
