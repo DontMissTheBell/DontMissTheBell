@@ -164,6 +164,7 @@ public class GhostManager : MonoBehaviour
 
         using GZipStream compressor = new(compressedData, CompressionLevel.Optimal, true);
         uncompressedData.CopyTo(compressor);
+        compressor.Close();
 
         compressedData.Seek(0, SeekOrigin.Begin);
         return compressedData;
