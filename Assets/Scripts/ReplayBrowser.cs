@@ -31,6 +31,8 @@ public class ReplayBrowser : MonoBehaviour
         // Abort if json did not contain a valid LeaderboardSection object
         if (leaderboardSection.entries == null) return;
 
+        var usernameQueue = new Queue<string>(leaderboardSection.usernames);
+
         // Clean up old entries from UI
         foreach (var leaderboardEntry in leaderboardEntries.Skip(1))
         {
@@ -49,7 +51,7 @@ public class ReplayBrowser : MonoBehaviour
 
             // Set label contents
             var entryText = currentEntry.GetComponentInChildren<TextMeshProUGUI>();
-            entryText.text = leaderboardEntry.ghostId;
+            entryText.text = $"{usernameQueue.Dequeue()} - {leaderboardEntry.time}";
 
             // Assign function call to Watch button
             var button = currentEntry.GetComponentInChildren<Button>();
@@ -94,7 +96,6 @@ public class ReplayBrowser : MonoBehaviour
 [Serializable]
 public class LeaderboardEntry
 {
-    public int playerId;
     public int levelId;
     public float time;
     public string ghostId;
@@ -107,4 +108,6 @@ public class LeaderboardSection
     public int pageSize;
     public int totalPages;
     public int Size => entries.Length;
+
+    public string[] usernames;
 }

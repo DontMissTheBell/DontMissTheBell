@@ -1,6 +1,6 @@
+using DG.Tweening;
 using System;
 using System.Collections;
-using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,7 +16,14 @@ public class Globals : MonoBehaviour
     // Global variables
     public bool gamePaused;
     public bool levelComplete;
-    public bool gameResumed;
+
+    public int playerID;
+
+    public static string Username
+    {
+        get => PlayerPrefs.GetString("username");
+        set => PlayerPrefs.SetString("username", value);
+    }
 
     public bool cutsceneActive;
     public event EventHandler CutsceneOver;
@@ -26,7 +33,7 @@ public class Globals : MonoBehaviour
 
     // Loading screen
     private RectTransform loadingScreen;
-    public string APIEndpoint => devAPI ? "http://localhost:8080/api" : "https://dmtb.catpowered.net/api";
+    public string APIEndpoint => devAPI ? "http://localhost:8080/api" : "https://api.catpowered.net/dmtb";
 
     public static Globals Instance
     {
@@ -52,7 +59,18 @@ public class Globals : MonoBehaviour
         loadingScreen = GameObject.FindGameObjectWithTag("LoadingScreen").GetComponent<RectTransform>();
 
         gamePaused = 0.0f == Time.timeScale;
-        gameResumed = 1.0f == Time.timeScale;
+        if (!PlayerPrefs.HasKey("player_id"))
+        {
+            // Generate a random player ID on first run
+            playerID = new System.Random().Next();
+            PlayerPrefs.SetInt("player_id", playerID);
+        }
+        else
+        {
+            playerID = PlayerPrefs.GetInt("player_id");
+            Username = PlayerPrefs.GetString("username");
+        }
+
     }
 
     public void EndCutscene()

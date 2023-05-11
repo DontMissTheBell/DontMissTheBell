@@ -1,16 +1,31 @@
+using System;
 using Cinemachine;
+using TMPro;
 using UnityEngine;
 
 public class MenuTransitioner : MonoBehaviour
 {
     [SerializeField] private CinemachineVirtualCamera currentCamera;
+    [SerializeField] protected CinemachineVirtualCamera optionsCamera;
+    public GameObject usernamePanel;
+    public TextMeshProUGUI usernamePlaceholderText;
 
     // Start is called before the first frame update
     private void Start()
     {
         Application.targetFrameRate = 60;
+        if (string.IsNullOrWhiteSpace(Globals.Username))
+        {
+            UpdateCamera(optionsCamera);
+            ToggleUsernamePanel(true);
+        }
     }
 
+    public void ToggleUsernamePanel(bool toggle)
+    {
+        usernamePanel.SetActive(toggle);
+        usernamePlaceholderText.text = Globals.Username;
+    }
 
     public void UpdateCamera(CinemachineVirtualCamera target)
     {

@@ -252,7 +252,7 @@ public class GhostManager : MonoBehaviour
         Debug.Log($"Final raw data size: {ghostData.Length / 1024}KB");
         compressedGhostData = Compress(ghostData);
         Debug.Log($"Final ghost size: {compressedGhostData.Length / 1024}KB");
-        StartCoroutine(UploadGhost(compressedGhostData.ToArray(), 0, SceneManager.GetActiveScene().buildIndex,
+        StartCoroutine(UploadGhost(compressedGhostData.ToArray(), Globals.Instance.playerID, SceneManager.GetActiveScene().buildIndex,
             replayLength));
     }
 
