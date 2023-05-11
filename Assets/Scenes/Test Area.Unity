@@ -38231,10 +38231,6 @@ PrefabInstance:
       propertyPath: damageTint
       value: 
       objectReference: {fileID: 603294616}
-    - target: {fileID: 629006821951210365, guid: 4d18cd59665733748a524eff5aba0559, type: 3}
-      propertyPath: defaultWalkSpeed
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 629006821951210367, guid: 4d18cd59665733748a524eff5aba0559, type: 3}
       propertyPath: m_RootOrder
       value: 4
