@@ -5,6 +5,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ReplayBrowser : MonoBehaviour
@@ -51,7 +52,7 @@ public class ReplayBrowser : MonoBehaviour
 
             // Set label contents
             var entryText = currentEntry.GetComponentInChildren<TextMeshProUGUI>();
-            entryText.text = $"{usernameQueue.Dequeue()} - {leaderboardEntry.time}";
+            entryText.text = $"{usernameQueue.Dequeue()} - {leaderboardEntry.time} - {Globals.GetSceneNameFromId(leaderboardEntry.levelId)}";
 
             // Assign function call to Watch button
             var button = currentEntry.GetComponentInChildren<Button>();

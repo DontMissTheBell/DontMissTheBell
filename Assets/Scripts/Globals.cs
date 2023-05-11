@@ -96,12 +96,7 @@ public class Globals : MonoBehaviour
 
         if (sceneId >= 0)
         {
-            // Convert BuildIndex (levelId) to scene name
-            sceneName = SceneUtility.GetScenePathByBuildIndex(sceneId);
-            var slashLocation = sceneName.LastIndexOf('/');
-            sceneName = sceneName[slashLocation..];
-            var dotLocation = sceneName.LastIndexOf('.');
-            sceneName = sceneName[..dotLocation];
+            sceneName = GetSceneNameFromId(sceneId);
             SceneManager.LoadSceneAsync(sceneId);
         }
         else
@@ -119,5 +114,14 @@ public class Globals : MonoBehaviour
         // Finish animation
         yield return new WaitForSeconds(0.25f);
         loadingScreen.DORotate(Vector3.left * 90, LoadDuration);
+    }
+
+    public static string GetSceneNameFromId(int id)
+    {
+        var sceneName = SceneUtility.GetScenePathByBuildIndex(id);
+        var slashLocation = sceneName.LastIndexOf('/');
+        sceneName = sceneName[slashLocation..];
+        var dotLocation = sceneName.LastIndexOf('.');
+        return sceneName[..dotLocation].TrimStart('/');
     }
 }

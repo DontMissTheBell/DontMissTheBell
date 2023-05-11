@@ -10,6 +10,8 @@ public class UsernameEditor : MonoBehaviour
 
     public void StartUsernameUpload()
     {
+        // Do nothing if name blank
+        if (string.IsNullOrWhiteSpace(usernameBox.text)) return;
         Globals.Username = usernameBox.text;
         StartCoroutine(UploadUsername());
     }
