@@ -3,29 +3,24 @@ using UnityEngine;
 
 public class Timer : MonoBehaviour
 {
-    public float timeLimit;
+    public float minuteLimit = 5; // 5 minutes = late
 
     [SerializeField] private TMP_Text timerText;
 
     private float currentTime;
 
-    private void Start()
-    {
-        currentTime = timeLimit;
-    }
-
     private void Update()
     {
-        if (!Globals.Instance.levelComplete && currentTime != 0)
+        if (!Globals.Instance.levelComplete && !Globals.Instance.runningLate)
         {
-            currentTime -= Time.deltaTime;
-            if (currentTime <= 0)
+            currentTime += Time.deltaTime;
+            if (currentTime >= minuteLimit * 60) 
             {
-                currentTime = 0;
                 Debug.Log("Lose");
+                Globals.Instance.runningLate = true;
             }
 
-            timerText.text = currentTime.ToString("F2");
+            timerText.text = currentTime >= minuteLimit * 60 ? currentTime.ToString("F2") : "Late";
         }
     }
 }
