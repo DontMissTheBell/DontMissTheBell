@@ -18,6 +18,7 @@ public class Globals : MonoBehaviour
     public bool levelComplete;
     public bool runningLate;
     public bool dynamicFOV;
+    public bool firstRun;
 
     public int playerID;
     public Guid playerSecret;
@@ -64,6 +65,7 @@ public class Globals : MonoBehaviour
         gamePaused = 0.0f == Time.timeScale;
         if (!PlayerPrefs.HasKey("player_id") || !PlayerPrefs.HasKey("player_secret"))
         {
+            firstRun = true;
             // Generate a random player ID on first run
             playerID = new System.Random().Next();
             PlayerPrefs.SetInt("player_id", playerID);
