@@ -2,12 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Optionsbuttonscript : MonoBehaviour
 {
+
     // Start is called before the first frame update
     void Start()
     {
+        
+        gameObject.GetComponent<Toggle>().isOn = Globals.Instance.dynamicFOV;
         
     }
 
@@ -29,7 +33,7 @@ public class Optionsbuttonscript : MonoBehaviour
 
     public void setDynamicFOV()
     {
-        Globals.Instance.dynamicFOV = !Globals.Instance.dynamicFOV;
+        Globals.Instance.dynamicFOV = !Globals.Instance.dynamicFOV; 
         PlayerPrefs.SetInt("dynamic_fov", Convert.ToInt32(Globals.Instance.dynamicFOV));
     }
 
