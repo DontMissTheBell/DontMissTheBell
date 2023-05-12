@@ -61,9 +61,9 @@ public class GhostManager : MonoBehaviour
     {
         if (Globals.Instance.levelComplete && currentlyRecording) FinishRecording();
         if (cameraTransform.localRotation != idealCameraRotation && playbackBegun &&
-            currentFrameIndex + 1 != replayLength)
-            cameraTransform.rotation =
-                Quaternion.LerpUnclamped(cameraTransform.rotation, idealCameraRotation, Time.deltaTime * 1000000);
+            currentFrameIndex + 1 != replayLength) return;
+        //cameraTransform.rotation = idealCameraRotation;
+        //Quaternion.LerpUnclamped(cameraTransform.rotation, idealCameraRotation, Time.deltaTime * 1000000);
     }
 
     private void FixedUpdate()
