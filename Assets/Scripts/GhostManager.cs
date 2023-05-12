@@ -61,9 +61,9 @@ public class GhostManager : MonoBehaviour
     {
         if (Globals.Instance.levelComplete && currentlyRecording) FinishRecording();
         if (cameraTransform.localRotation != idealCameraRotation && playbackBegun &&
-            currentFrameIndex + 1 != replayLength) return;
-        //cameraTransform.rotation = idealCameraRotation;
-        //Quaternion.LerpUnclamped(cameraTransform.rotation, idealCameraRotation, Time.deltaTime * 1000000);
+            currentFrameIndex + 1 != replayLength)
+            cameraTransform.rotation =
+                Quaternion.LerpUnclamped(cameraTransform.rotation, idealCameraRotation, Time.deltaTime * 10);
     }
 
     private void FixedUpdate()
@@ -437,8 +437,8 @@ public class ReplayFrame
                 eulerAngles.z = BitConverter.ToSingle(rotationBytes, 2 * sizeof(float));
 
                 // If there is camera data after the player transform
-                //Debug.Log(value[POSITION_SIZE + ROTATION_SIZE + 1]);
-                if (value[PositionSize + RotationSize + 1] == 0x01)
+                //Debug.Log(value[POSITION_SIZE + ROTATION_SIZE + 2]);
+                if (value[PositionSize + RotationSize + 2] == 0x01)
                 {
                     hasCameraTransform = true;
                     Buffer.BlockCopy(value, 3 + PositionSize + RotationSize, cameraEulerAnglesBytes, 0, CameraSize);
