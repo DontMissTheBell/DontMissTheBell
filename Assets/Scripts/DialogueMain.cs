@@ -47,7 +47,7 @@ public class DialogueMain : MonoBehaviour
 
             textDisplay.text += t;
 
-            if (Input.GetMouseButton(1)) skipBox = true;
+            if (Input.GetMouseButton(1) || Input.GetMouseButtonDown(0)) skipBox = true;
 
             if (!skipBox) yield return new WaitForSeconds(delay);
         }
@@ -56,7 +56,7 @@ public class DialogueMain : MonoBehaviour
 
         //clickToSkip.SetActive(false);
 
-        while (!Input.GetMouseButtonDown(0)) yield return null;
+        while (!(Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))) yield return null;
 
         while (Globals.Instance.gamePaused) yield return null;
 

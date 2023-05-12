@@ -1,55 +1,37 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Cutscene : MonoBehaviour
 {
+    [SerializeField] private DialogueMain Dialogue1;
+    [SerializeField] private DialogueMain Dialogue2;
+    [SerializeField] private Camera CutsceneCamera;
 
-    DialogueMain Dialogue;
-    [SerializeField] DialogueMain Dialogue1; 
-    [SerializeField] DialogueMain Dialogue2; 
-    [SerializeField] Camera CutsceneCamera;
-
-    [SerializeField] GameObject TimerObject;
-    [SerializeField] GameObject clickToStart;
+    [SerializeField] private GameObject TimerObject;
+    [SerializeField] private GameObject clickToStart;
 
 
     public bool writingDialogue;
 
+    private DialogueMain Dialogue;
 
-    void Awake()
+
+    private void Awake()
     {
-        if (string.IsNullOrEmpty(Globals.Instance.replayToStart))
-        {
-            Globals.Instance.cutsceneActive = true;
-        }
-
+        if (string.IsNullOrEmpty(Globals.Instance.replayToStart)) Globals.Instance.cutsceneActive = true;
     }
-    void Start()
+
+    private void Start()
     {
         if (Globals.Instance.cutsceneActive)
         {
-            if (Globals.Instance.runningLate)
-            {
-                Dialogue = Dialogue2;
-            }
-            else
-            {
-                Dialogue = Dialogue1;
-            }
+            Dialogue = Globals.Instance.runningLate ? Dialogue2 : Dialogue1;
 
-            if (Globals.Instance.firstRun)
-            {
-                Dialogue = Dialogue2;
-            }
-            else
-            {
-                Dialogue = Dialogue1;
-            }
+            Dialogue = Globals.Instance.firstRun ? Dialogue2 : Dialogue1;
             Dialogue.gameObject.SetActive(true);
             TimerObject.SetActive(false);
-            StartCoroutine(StartCutscene()); 
+            StartCoroutine(StartCutscene());
         }
         else
         {
@@ -62,18 +44,13 @@ public class Cutscene : MonoBehaviour
     private IEnumerator StartCutscene()
     {
         if (!Globals.Instance.skipCutscene)
-        {
-            for(int i=0; i < Dialogue.DialogueBoxes.Length; i++)
+            for (var i = 0; i < Dialogue.DialogueBoxes.Length; i++)
             {
                 writingDialogue = true;
                 Dialogue.StartWritingText(i);
 
-                while (writingDialogue)
-                {
-                    yield return null;
-                }
+                while (writingDialogue) yield return null;
             }
-        }
 
         Dialogue.gameObject.SetActive(false);
 
@@ -82,10 +59,7 @@ public class Cutscene : MonoBehaviour
         if (Globals.Instance.skipCutscene)
         {
             clickToStart.SetActive(true);
-            while(!Input.GetMouseButtonDown(0))
-            {
-                yield return null;
-            }
+            while (!Input.GetMouseButtonDown(0)) yield return null;
             clickToStart.SetActive(false);
         }
 
@@ -98,11 +72,7 @@ public class Cutscene : MonoBehaviour
         Globals.Instance.skipCutscene = false;
 
 
-
         if (SceneManager.GetActiveScene().name == "EndCutscene")
-        {
-            Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu")); 
-        }
+            Globals.Instance.StartCoroutine(Globals.Instance.TriggerLoadingScreen("Main Menu"));
     }
-
 }
