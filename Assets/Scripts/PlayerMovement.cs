@@ -213,27 +213,26 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     // Used by ghost replays
     public void SetCameraState(CameraState state)
     {
-        cameraState = state;
+        if (cameraState == state) return;
         switch (state)
         {
             case CameraState.Standard:
-                Debug.Log("standard");
                 playerMesh.SetActive(true);
-                playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y + 0.9f, 0.1f)
-                    .SetEase(Ease.InOutSine);
                 break;
             case CameraState.Crouching:
-                Debug.Log("crouch");
                 playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y - 0.9f, 0.1f)
                     .SetEase(Ease.InOutSine);
                 break;
             case CameraState.Rolling:
-                Debug.Log("roll");
                 playerMesh.SetActive(false);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(state), state, null);
         }
+        if (cameraState == CameraState.Crouching && state != cameraState)
+            playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y + 0.9f, 0.1f)
+                .SetEase(Ease.InOutSine);
+        cameraState = state;
     }
 
     private void OnTriggerEnter(Collider other)
