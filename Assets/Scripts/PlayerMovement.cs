@@ -203,8 +203,11 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 if (!restartWarningIssued)
                     StartCoroutine(RestartWarning());
                 else
+                {
+                    Time.timeScale = 1.0f;
                     Globals.Instance.StartCoroutine(
                         Globals.Instance.TriggerLoadingScreen(sceneId: SceneManager.GetActiveScene().buildIndex));
+                }
             }
         }
 
