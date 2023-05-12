@@ -109,6 +109,7 @@ MonoBehaviour:
   wallRunSpeed: 10
   wallJumpDelay: 0.05
   wallRunTiltMax: 7.5
+  wallRunDelayMax: 0.1
   grapJumpDelay: 0.1
   vaultDuration: 0.35
   maxVaultDistance: 6
@@ -185,6 +186,7 @@ MonoBehaviour:
   cameraTransform: {fileID: 2585393877244425644}
   shouldRecord: 1
   shouldReplay: 0
+  shouldPlayCutscene: 0
   ghostID: 
 --- !u!114 &1495129359
 MonoBehaviour:

@@ -59,6 +59,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField] private float wallJumpDelay;
     [SerializeField] private float wallRunTiltMax;
 
+    [SerializeField] private float wallRunDelayMax;
+    private float wallRunDelay;
+
     [Header("Grapple")] [SerializeField] private float grapJumpDelay;
     [Header("Vault")] [SerializeField] private float vaultDuration;
     [SerializeField] private float maxVaultDistance;
@@ -296,6 +299,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 ySpeed = mcJumpHeight;
                 jumpBuffer = 0f;
                 coyoteTimeCounter = 0;
+
+                wallRunDelay = wallRunDelayMax;
             }
 
             if (!dodging)
@@ -317,11 +322,12 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             // Disabled because we don't use it in any level at the moment
             // if (Input.GetKey(KeyCode.V) && CheckVault()) Vault();
 
-
+            wallRunDelay -= Time.deltaTime;
+            // Wallrun
             if (!OnGround())
             {
                 if (Input.GetButtonDown("Jump") && CheckGrap()) Grap();
-                if (CheckWallRun() && canWallRun && Input.GetButton("Jump")) StartWallRun();
+                if (CheckWallRun() && canWallRun && wallRunDelay <= 0 && Input.GetButton("Jump")) StartWallRun();
             }
 
             if (controller.isGrounded) //
