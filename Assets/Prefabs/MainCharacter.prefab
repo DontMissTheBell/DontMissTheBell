@@ -107,7 +107,7 @@ MonoBehaviour:
   dodgePower: 3
   mcJumpHeight: 10
   jumpBufferMax: 0.05
-  jumpDelayMax: 0.35
+  jumpDelayMax: 0.4
   coyoteTime: 0.2
   slidePower: 27.5
   slideDuration: 1.5
