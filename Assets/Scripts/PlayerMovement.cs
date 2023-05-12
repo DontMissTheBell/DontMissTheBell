@@ -25,7 +25,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     [SerializeField] private float ySpeed; // The speed the player is falling
 
-    public enum CameraState
+    public enum CameraState : byte
     {
         Standard,
         Crouching,
