@@ -264,7 +264,10 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             var otherScript = other.GetComponent<Objectives>();
             otherScript.tweener1.Kill();
             otherScript.tweener2.Kill();
-            Destroy(other.gameObject);
+
+            otherScript.PlayParticle();
+
+            Destroy(other.gameObject, 1f);
         }
     }
 
@@ -736,6 +739,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         // This function will ensure that the player will finish the roll looking straight ahead
         cameraScript.StartRoll(duration);
 
+        controller.height = 1;
+        controller.center = new Vector3(0, -0.5f, 0);
+
         walkSpeed /= 1.5f;
         isRolling = true;
         SetCameraState(CameraState.Rolling);
@@ -754,6 +760,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             yield return null;
         }
+
+        controller.height = 2;
+        controller.center = new Vector3(0, 0, 0);
 
         walkSpeed *= 1.5f;
         isRolling = false;

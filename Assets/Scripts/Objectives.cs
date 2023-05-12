@@ -8,6 +8,9 @@ public class Objectives : MonoBehaviour
     public Tweener tweener1;
     public Tweener tweener2;
 
+    [SerializeField] private ParticleSystem particles;
+    [SerializeField] private GameObject homeworkModel;
+
     private void Start()
     {
         tweener1 = transform.DOMove(transform.position + Vector3.up / 2, 1.5f).SetEase(Ease.InOutSine)
@@ -23,5 +26,11 @@ public class Objectives : MonoBehaviour
             homeworkCompleted = true;
             Debug.Log("Homework Obtained");
         }
+    }
+
+    public void PlayParticle()
+    {
+        particles.Play();
+        homeworkModel.SetActive(false);
     }
 }
