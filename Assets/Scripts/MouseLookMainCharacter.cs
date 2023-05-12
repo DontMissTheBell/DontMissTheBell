@@ -34,7 +34,7 @@ public class MouseLookMainCharacter : MonoBehaviour
         var mouseY = 0f;
 
         // Only runs if the game is unpaused
-        if (!Globals.Instance.gamePaused&& !Globals.Instance.cutsceneActive)
+        if (!Globals.Instance.gamePaused && !Globals.Instance.cutsceneActive)
         {
             mouseX = Input.GetAxis("Mouse X") * mouseSensitivity *
                      Time.fixedDeltaTime; // creates a variable saying to move the camera along x axis if mouse is moving along x axis at the mouseSensitivity rate multiplied by time delta
