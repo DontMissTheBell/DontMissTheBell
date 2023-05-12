@@ -72,7 +72,6 @@ public class Cutscene : MonoBehaviour
                 {
                     yield return null;
                 }
-
             }
         }
 

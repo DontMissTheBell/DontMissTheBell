@@ -10,6 +10,8 @@ public class DialogueMain : MonoBehaviour
 
     [SerializeField] private Cutscene Cutscene;
 
+    [SerializeField] GameObject clickToSkip;
+
     private GameObject currentAvatar;
     private GameObject lastAvatar;
 
@@ -18,6 +20,8 @@ public class DialogueMain : MonoBehaviour
     public void StartWritingText(int index)
     {
         DialogueBoxes[index].SetActive(true);
+
+        clickToSkip.SetActive(true);
 
 
         if (index > 0) 
@@ -61,6 +65,8 @@ public class DialogueMain : MonoBehaviour
         }
 
         yield return new WaitForSeconds(delay);
+
+        clickToSkip.SetActive(false);
 
         while(!Input.GetMouseButtonDown(0))
         {

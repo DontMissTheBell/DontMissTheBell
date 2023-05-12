@@ -79,7 +79,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Press right click to skip dialogue
+  m_Text: Right click to fast foward text
 --- !u!1 &6956368324685598691
 GameObject:
   m_ObjectHideFlags: 0
@@ -444,6 +444,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   delay: 0.015
   Cutscene: {fileID: 0}
+  clickToSkip: {fileID: 2095574588965111978}
   DialogueBoxes:
   - {fileID: 6956368324685598691}
   - {fileID: 0}
