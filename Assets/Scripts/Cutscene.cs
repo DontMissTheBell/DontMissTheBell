@@ -37,6 +37,11 @@ public class Cutscene : MonoBehaviour
             {
                 Dialogue = Dialogue1;
             }
+
+            //if (Globals.Instance.firstRun)
+            //{
+
+            //}
             Dialogue.gameObject.SetActive(true);
             TimerObject.SetActive(false);
             StartCoroutine(StartCutscene()); 
