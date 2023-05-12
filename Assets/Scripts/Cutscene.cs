@@ -37,6 +37,15 @@ public class Cutscene : MonoBehaviour
             {
                 Dialogue = Dialogue1;
             }
+
+            if (Globals.Instance.firstRun)
+            {
+                Dialogue = Dialogue2;
+            }
+            else
+            {
+                Dialogue = Dialogue1;
+            }
             Dialogue.gameObject.SetActive(true);
             TimerObject.SetActive(false);
             StartCoroutine(StartCutscene()); 
@@ -62,6 +71,8 @@ public class Cutscene : MonoBehaviour
             }
 
         }
+        Globals.Instance.firstRun = false;
+
         Globals.Instance.EndCutscene();
 
         Dialogue.gameObject.SetActive(false);

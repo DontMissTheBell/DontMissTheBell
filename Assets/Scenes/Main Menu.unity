@@ -3564,6 +3564,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GlobalsHost
       objectReference: {fileID: 0}
+    - target: {fileID: 1971917498670278371, guid: 7b16e74e0ab45a743989ca2d3ad0bf7c, type: 3}
+      propertyPath: firstRun
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6518371054017321120, guid: 7b16e74e0ab45a743989ca2d3ad0bf7c, type: 3}
       propertyPath: m_RootOrder
       value: 0

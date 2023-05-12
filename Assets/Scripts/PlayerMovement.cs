@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField] private Camera playerCamera;
     [SerializeField] private GameObject cameraPivot;
     [SerializeField] private GameObject playerMesh;
+    [SerializeField] private Canvas restartWarningCanvas;
 
     [SerializeField] private int health;
 
@@ -132,6 +133,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private MovementStates mState = MovementStates.Run;
 
     private bool playerOnGround;
+    private bool restartWarningIssued;
     private ParticleSystem powerupParticleSystemSpeed;
     private ParticleSystem powerupParticleSystemJump;
     private RaycastHit rightWallData;
@@ -196,6 +198,14 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         if (!Globals.Instance.cutsceneActive)
         {
             MovementState();
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                if (!restartWarningIssued)
+                    StartCoroutine(RestartWarning());
+                else
+                    Globals.Instance.StartCoroutine(
+                        Globals.Instance.TriggerLoadingScreen(sceneId: SceneManager.GetActiveScene().buildIndex));
+            }
         }
 
         // If the player has failed a roll
@@ -212,6 +222,15 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         // Smoothly changes the cameras FOV depending on if the value of the targetFov value
         if (Globals.Instance.dynamicFOV)
             playerCamera.fieldOfView = Mathf.SmoothDamp(playerCamera.fieldOfView, targetFov, ref dampingVelocity, 0.1f);
+    }
+
+    private IEnumerator RestartWarning()
+    {
+        restartWarningIssued = true;
+        restartWarningCanvas.enabled = true;
+        yield return new WaitForSeconds(3);
+        restartWarningCanvas.enabled = false;
+        restartWarningIssued = false;
     }
 
     // Used by ghost replays
