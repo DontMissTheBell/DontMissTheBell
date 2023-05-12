@@ -276,7 +276,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                         FailRoll();
                     health = health -= 1;
                 }
-                jumpDelay = jumpDelayMax;
 
                 playerOnGround = true;
             }
@@ -304,6 +303,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 ySpeed = mcJumpHeight;
                 jumpBuffer = 0f;
                 coyoteTimeCounter = 0;
+                
+                jumpDelay = jumpDelayMax;
 
                 wallRunDelay = wallRunDelayMax;
             }
