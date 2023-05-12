@@ -7641,7 +7641,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afd7271233db1324eb9189f43658094a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fullscreenToggle: {fileID: 0}
+  fullscreenToggle: {fileID: 761780955}
   dynamicFOVToggle: {fileID: 617815034}
 --- !u!1 &1404581319
 GameObject:
