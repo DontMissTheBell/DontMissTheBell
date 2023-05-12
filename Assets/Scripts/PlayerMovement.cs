@@ -66,6 +66,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [Header("Roll")] [SerializeField] private Image damageTint;
 
     [SerializeField] private float maxFallHeight;
+    [SerializeField] private float maxRollHeight;
 
     [SerializeField] private float rollDurationMax;
 
@@ -317,11 +318,14 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             {
                 if (ySpeed <= maxFallHeight) // If the player falls from high enough to need to roll
                 {
-                    if (Input.GetKey(KeyCode.C))
-                        StartCoroutine(Roll());
-                    else
+                    if (!Input.GetKey(KeyCode.C))
                         FailRoll();
                     health = health -= 1;
+                }
+                if (ySpeed <= maxRollHeight)
+                {
+                    if (Input.GetKey(KeyCode.C))
+                        StartCoroutine(Roll());   
                 }
 
                 playerOnGround = true;
