@@ -21131,6 +21131,7 @@ MonoBehaviour:
   slideDuration: 1.5
   damageTint: {fileID: 0}
   maxFallHeight: 0
+  maxRollHeight: 0
   rollDurationMax: 0
   wallJumpForce: 20
   wallJumpTimeMax: 0.5
