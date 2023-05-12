@@ -17,6 +17,7 @@ public class GhostManager : MonoBehaviour
 
     // This is the camera object
     public Transform cameraTransform;
+    public PlayerMovement playerMovement;
 
     // Enable this to make the script record for this object
     public bool shouldRecord;
@@ -85,6 +86,8 @@ public class GhostManager : MonoBehaviour
                 cameraTransform.hasChanged = false;
                 replayFrame.CameraTransform = cameraTransform;
             }
+
+            replayFrame.cameraState = playerMovement.cameraState;
 
             replayFrame.Write(dataWriter);
             replayLength++;
@@ -301,6 +304,7 @@ public class ReplayFrame
     public const int PositionSize = 3 * sizeof(float);
     public const int RotationSize = 3 * sizeof(float);
     public const int CameraSize = 3 * sizeof(float);
+    public PlayerMovement.CameraState cameraState;
     public Vector3 cameraRotation;
     public bool hasCameraTransform;
     private bool hasTransform;
@@ -308,11 +312,12 @@ public class ReplayFrame
     private Vector3 position, eulerAngles;
 
     // Class initializer, optional parameter is transform and camera transform
-    public ReplayFrame(Transform tr = null, Transform cameraTr = null, byte[] byteArray = null)
+    public ReplayFrame(Transform tr = null, Transform cameraTr = null, byte[] byteArray = null, PlayerMovement.CameraState cameraSt = PlayerMovement.CameraState.Standard)
     {
         if (byteArray != null) AsByteArray = byteArray;
         if (tr) Transform = tr;
         if (cameraTr) CameraTransform = cameraTr;
+        cameraState = cameraSt;
     }
 
     // Extracts the position and rotation data from a given transform,
@@ -341,7 +346,9 @@ public class ReplayFrame
     {
         get
         {
-            var bytes = new byte[2];
+            var bytes = new byte[3];
+            // Save cameraState as first byte
+            bytes[0] = (byte) cameraState;
             if (hasTransform)
             {
                 // Create byte array of correct size to convert floats into
@@ -362,10 +369,10 @@ public class ReplayFrame
                 Buffer.BlockCopy(BitConverter.GetBytes(eulerAngles.z), 0, transformBytes, 1 + 5 * sizeof(float),
                     sizeof(float));
 
-                // Create a byte array to merge our arrays into, -1 because we are overwriting the first byte
+                // Create a byte array to merge our arrays into, -1 because we are overwriting the middle byte
                 var newBytes = new byte[transformBytes.Length + bytes.Length - 1];
                 // Starts array with all of transformBytes data, leaving 0x00 at the end
-                Buffer.BlockCopy(transformBytes, 0, newBytes, 0, transformBytes.Length);
+                Buffer.BlockCopy(transformBytes, 0, newBytes, 1, transformBytes.Length);
                 // Overwrites old instance of bytes
                 bytes = newBytes;
             }
@@ -401,7 +408,9 @@ public class ReplayFrame
         {
             var cameraEulerAnglesBytes = new byte[CameraSize];
 
-            if (value[0] == 0x01)
+            cameraState = (PlayerMovement.CameraState) value[0];
+
+            if (value[1] == 0x01)
             {
                 hasTransform = true;
 
@@ -410,8 +419,8 @@ public class ReplayFrame
                 var rotationBytes = new byte[RotationSize];
 
                 // Copy position and rotation into respective arrays
-                Buffer.BlockCopy(value, 1, positionBytes, 0, PositionSize);
-                Buffer.BlockCopy(value, 1 + PositionSize, rotationBytes, 0, RotationSize);
+                Buffer.BlockCopy(value, 2, positionBytes, 0, PositionSize);
+                Buffer.BlockCopy(value, 2 + PositionSize, rotationBytes, 0, RotationSize);
 
                 // Unpack to Vector3s
                 position.x = BitConverter.ToSingle(positionBytes, 0 * sizeof(float));
@@ -427,14 +436,14 @@ public class ReplayFrame
                 if (value[PositionSize + RotationSize + 1] == 0x01)
                 {
                     hasCameraTransform = true;
-                    Buffer.BlockCopy(value, 2 + PositionSize + RotationSize, cameraEulerAnglesBytes, 0, CameraSize);
+                    Buffer.BlockCopy(value, 3 + PositionSize + RotationSize, cameraEulerAnglesBytes, 0, CameraSize);
                 }
             }
             // If there is only camera data (no player transform)
-            else if (value[1] == 0x01)
+            else if (value[2] == 0x01)
             {
                 hasCameraTransform = true;
-                Buffer.BlockCopy(value, 2, cameraEulerAnglesBytes, 0, CameraSize);
+                Buffer.BlockCopy(value, 3, cameraEulerAnglesBytes, 0, CameraSize);
             }
 
             // Unpack to Vector3
