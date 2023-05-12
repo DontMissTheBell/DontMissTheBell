@@ -210,7 +210,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         }
 
         // Smoothly changes the cameras FOV depending on if the value of the targetFov value
-        if (Globals.Instance.DynamicFOV)
+        if (Globals.Instance.dynamicFOV)
             playerCamera.fieldOfView = Mathf.SmoothDamp(playerCamera.fieldOfView, targetFov, ref dampingVelocity, 0.1f);
     }
 
