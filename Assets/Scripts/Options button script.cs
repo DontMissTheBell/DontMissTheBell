@@ -26,5 +26,10 @@ public class Optionsbuttonscript : MonoBehaviour
         QualitySettings.SetQualityLevel(qualityIndex);
     }
 
+    public void setDynamicFOV()
+    {
+        Globals.Instance.DynamicFOV = !Globals.Instance.DynamicFOV;
+    }
+
     //void for volume here when get music
 }
