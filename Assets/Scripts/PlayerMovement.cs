@@ -42,6 +42,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [SerializeField]
     private float jumpBufferMax = 0.25f; // The time frame that the game will store the players jump input
 
+    [SerializeField] private float jumpDelayMax;
+
     [SerializeField] private float coyoteTime = 0.2f;
 
     [SerializeField] private float slidePower;
@@ -259,11 +261,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             controller.Move(velocity *
                             Time.deltaTime); // moves our character controller we inputted by the vector3 variable multiplied by the speed we initialised then multiplied by time delta, this ensures we move at a constant speed in correlation to our fps so there is no stuttering etc
 
-            jumpDelay -= Time.deltaTime; // This code handles the jump buffering system
-            if (Input.GetButton("Jump") && jumpDelay <= 0 && !failRoll)
-                jumpBuffer = jumpBufferMax;
-            else
-                jumpBuffer -= Time.deltaTime;
 
             crouchDelay -= Time.deltaTime;
 
@@ -279,8 +276,16 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                         FailRoll();
                     health = health -= 1;
                 }
+                jumpDelay = jumpDelayMax;
+
                 playerOnGround = true;
             }
+
+            jumpDelay -= Time.deltaTime; // This code handles the jump buffering system
+            if (Input.GetButton("Jump") && jumpDelay <= 0 && !failRoll)
+                jumpBuffer = jumpBufferMax;
+            else
+                jumpBuffer -= Time.deltaTime;
 
             if (controller.isGrounded)
             {
@@ -294,7 +299,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             }
 
             // If player is in air and pressed jump
-            if (coyoteTimeCounter > 0 && jumpBuffer > 0f)
+            if (coyoteTimeCounter > 0 && jumpBuffer > 0f && jumpDelay <= 0)
             {
                 ySpeed = mcJumpHeight;
                 jumpBuffer = 0f;
