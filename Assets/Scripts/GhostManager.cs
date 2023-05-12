@@ -24,6 +24,7 @@ public class GhostManager : MonoBehaviour
 
     // Enable this to playback a ghost recording (DEBUG)
     public bool shouldReplay;
+    public bool shouldUpload = true;
     public bool shouldPlayCutscene;
     public string ghostID;
     private MemoryStream compressedGhostData;
@@ -270,16 +271,19 @@ public class GhostManager : MonoBehaviour
 
     private IEnumerator UploadGhost(byte[] ghostData, int playerId, int levelId, uint length)
     {
-        var www = UnityWebRequest.Put($"{endpoint}/v1/submit-ghost", ghostData);
-        www.SetRequestHeader("X-Player-Id", playerId.ToString());
-        www.SetRequestHeader("X-Player-Secret", Globals.Instance.playerSecret.ToString());
-        www.SetRequestHeader("X-Level-Id", levelId.ToString());
-        www.SetRequestHeader("X-Replay-Length", length.ToString());
-        yield return www.SendWebRequest();
+        if (shouldUpload)
+        {
+            var www = UnityWebRequest.Put($"{endpoint}/v1/submit-ghost", ghostData);
+            www.SetRequestHeader("X-Player-Id", playerId.ToString());
+            www.SetRequestHeader("X-Player-Secret", Globals.Instance.playerSecret.ToString());
+            www.SetRequestHeader("X-Level-Id", levelId.ToString());
+            www.SetRequestHeader("X-Replay-Length", length.ToString());
+            yield return www.SendWebRequest();
 
-        Debug.Log(www.result != UnityWebRequest.Result.Success
-            ? www.error
-            : $"Upload complete! {www.downloadHandler.text}");
+            Debug.Log(www.result != UnityWebRequest.Result.Success
+                ? www.error
+                : $"Upload complete! {www.downloadHandler.text}");
+        }
 
         LevelCompleteEvent?.Invoke();
     }
