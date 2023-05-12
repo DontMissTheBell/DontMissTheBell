@@ -4067,7 +4067,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1866331431}
         m_TargetAssemblyTypeName: Optionsbuttonscript, Assembly-CSharp
-        m_MethodName: setDynamicFOV
+        m_MethodName: SetDynamicFOV
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5010,8 +5010,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1866331431}
         m_TargetAssemblyTypeName: Optionsbuttonscript, Assembly-CSharp
-        m_MethodName: setFullscreen
-        m_Mode: 0
+        m_MethodName: SetFullscreen
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -10839,6 +10839,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afd7271233db1324eb9189f43658094a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fullscreenToggle: {fileID: 0}
 --- !u!4 &1866331432
 Transform:
   m_ObjectHideFlags: 0
