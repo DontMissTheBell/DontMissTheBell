@@ -395,6 +395,11 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             controller.Move(slideDirection * Time.deltaTime * Mathf.Lerp(slidePower, 1, t));
 
+            if (!OnGround())
+            {
+                EndSlide();
+            }
+
             if (slideTime >= 0.1f && !Input.GetKey(KeyCode.C))
             {
                 if (!Physics.CheckCapsule(transform.position, transform.position + (Vector3.up*2),0.5f, ~uncrouchMask))
@@ -818,7 +823,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     private bool OnGround()
     {
-        return Physics.Raycast(transform.position, Vector3.down, 2, groundMask.value);
+        return Physics.Raycast(transform.position, Vector3.down, 2, ~uncrouchMask);
     }
 
     private enum MovementStates
