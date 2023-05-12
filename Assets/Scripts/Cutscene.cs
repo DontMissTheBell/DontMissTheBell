@@ -26,9 +26,9 @@ public class Cutscene : MonoBehaviour
     {
         if (Globals.Instance.cutsceneActive)
         {
-            Dialogue = Globals.Instance.runningLate ? Dialogue2 : Dialogue1;
-
-            Dialogue = Globals.Instance.firstRun ? Dialogue2 : Dialogue1;
+            Dialogue = Globals.Instance.levelComplete
+                ? Globals.Instance.runningLate ? Dialogue2 : Dialogue1
+                : Globals.Instance.firstRun ? Dialogue2 : Dialogue1;
             Dialogue.gameObject.SetActive(true);
             TimerObject.SetActive(false);
             StartCoroutine(StartCutscene());
