@@ -10,12 +10,13 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         controller; // creates a input on our player in unity called controller so we can input our character controller so we can link that to this script and interact with it through here
 
     [SerializeField] private Camera playerCamera;
+    [SerializeField] private GameObject cameraPivot;
 
     [SerializeField] private int health;
 
     [SerializeField] private float defaultWalkSpeed;
 
-    private float walkSpeed;
+    public float walkSpeed;
 
     [SerializeField] private float sprintSpeed;
 
@@ -54,6 +55,10 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     [Header("Roll")] [SerializeField] private Image damageTint;
 
     [SerializeField] private float maxFallHeight;
+
+    [SerializeField] private float rollDurationMax;
+
+    private bool isRolling;
 
 
     [Header("Wall Run")] [SerializeField] private float wallJumpForce;
@@ -339,14 +344,14 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 if (CheckWallRun() && canWallRun && wallRunDelay <= 0 && Input.GetButton("Jump")) StartWallRun();
             }
 
-            if (controller.isGrounded && !failRoll) //
+            if (controller.isGrounded && !failRoll && !isRolling) //
             {
                 if (Input.GetKey(KeyCode.C) && crouchDelay <= 0 && !isCrouching)
                 {
                     if (isSprinting) StartSlide(transform.forward * slidePower + transform.position);
                     StartCrouch();
                 }
-
+//
                 if (!Input.GetKey(KeyCode.C) && crouchDelay <= 0 && isCrouching)
                     if (isCrouching && !Physics.CheckCapsule(transform.position, transform.position + (Vector3.up*2),0.5f, ~uncrouchMask))
                         EndCrouch();
@@ -671,29 +676,38 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     private IEnumerator Roll()
     {
-        var startRotation = transform.eulerAngles.x;
+        var startRotation = cameraPivot.transform.eulerAngles.x;
         var endRotation = startRotation + 360.0f;
 
-        var yRotation = transform.eulerAngles.y;
-        var zRotation = transform.eulerAngles.z;
+        var yRotation = cameraPivot.transform.eulerAngles.y;
+        var zRotation = cameraPivot.transform.eulerAngles.z;
 
-        var duration = 0.5f;
+        var duration = rollDurationMax;
         var t = 0.0f;
 
         // This function will ensure that the player will finish the roll looking straight ahead
         cameraScript.StartRoll(duration);
 
+        walkSpeed /= 1.5f;
+        isRolling = true;
+
         while (t < duration)
         {
             t += Time.deltaTime;
 
-            var xRotation = Mathf.Lerp(startRotation, endRotation, t / duration) % 360;
+            var newT = t / duration;
+            newT = Mathf.Sin((newT * Mathf.PI) / 2); 
 
-            transform.eulerAngles = new Vector3(xRotation, yRotation, zRotation);
+            var xRotation = Mathf.Lerp(startRotation, endRotation, newT) % 360;
+
+            cameraPivot.transform.eulerAngles = new Vector3(xRotation, yRotation, zRotation);
 
 
             yield return null;
         }
+
+        walkSpeed *= 1.5f;
+        isRolling = false;
     }
 
     private void FailRoll()
