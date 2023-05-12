@@ -1,12 +1,10 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Optionsbuttonscript : MonoBehaviour
 {
-
+    public Toggle fullscreenToggle;
     // Start is called before the first frame update
     void Start()
     {
@@ -15,15 +13,9 @@ public class Optionsbuttonscript : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetFullscreen()
     {
-        
-    }
-
-    public void setFullscreen(bool FullscreenOn )
-    {
-        Screen.fullScreen = FullscreenOn;
+        Screen.fullScreen = fullscreenToggle.isOn;
     }
 
     public void SetQuality(int qualityIndex)
@@ -31,7 +23,7 @@ public class Optionsbuttonscript : MonoBehaviour
         QualitySettings.SetQualityLevel(qualityIndex);
     }
 
-    public void setDynamicFOV()
+    public void SetDynamicFOV()
     {
         Globals.Instance.dynamicFOV = !Globals.Instance.dynamicFOV; 
         PlayerPrefs.SetInt("dynamic_fov", Convert.ToInt32(Globals.Instance.dynamicFOV));
