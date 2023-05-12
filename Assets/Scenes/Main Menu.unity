@@ -7567,8 +7567,8 @@ RectTransform:
   - {fileID: 1774894524}
   - {fileID: 742005658}
   - {fileID: 120614420}
-  - {fileID: 357666842}
   - {fileID: 617815032}
+  - {fileID: 357666842}
   m_Father: {fileID: 333745561}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
