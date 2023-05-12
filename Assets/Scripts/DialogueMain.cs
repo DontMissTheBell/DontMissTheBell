@@ -47,7 +47,7 @@ public class DialogueMain : MonoBehaviour
 
             textDisplay.text += t;
 
-            if (Input.GetMouseButton(1) || Input.GetMouseButtonDown(0)) skipBox = true;
+            if (Input.GetMouseButton(1)) skipBox = true;
 
             if (!skipBox) yield return new WaitForSeconds(delay);
         }
