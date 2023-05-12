@@ -264,7 +264,10 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             var otherScript = other.GetComponent<Objectives>();
             otherScript.tweener1.Kill();
             otherScript.tweener2.Kill();
-            Destroy(other.gameObject);
+
+            otherScript.PlayParticle();
+
+            Destroy(other.gameObject, 1f);
         }
     }
 
