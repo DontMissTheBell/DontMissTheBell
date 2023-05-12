@@ -5,12 +5,11 @@ using UnityEngine.UI;
 public class Optionsbuttonscript : MonoBehaviour
 {
     public Toggle fullscreenToggle;
+    public Toggle dynamicFOVToggle;
     // Start is called before the first frame update
     void Start()
     {
-        
-        gameObject.GetComponent<Toggle>().isOn = Globals.Instance.dynamicFOV;
-        
+        dynamicFOVToggle.isOn = Globals.Instance.dynamicFOV;
     }
 
     public void SetFullscreen()
