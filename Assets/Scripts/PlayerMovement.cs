@@ -262,7 +262,6 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                             Time.deltaTime); // moves our character controller we inputted by the vector3 variable multiplied by the speed we initialised then multiplied by time delta, this ensures we move at a constant speed in correlation to our fps so there is no stuttering etc
 
 
-            crouchDelay -= Time.deltaTime;
 
             // Checks if the player lands on the ground
             if (!controller.isGrounded) playerOnGround = false;
@@ -344,10 +343,12 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                     StartCrouch();
                 }
 
-                if (!Input.GetKey(KeyCode.C))
+                if (!Input.GetKey(KeyCode.C) && crouchDelay <= 0 && isCrouching)
                     if (isCrouching && !Physics.CheckCapsule(transform.position, transform.position + (Vector3.up*2),0.5f, ~uncrouchMask))
                         EndCrouch();
             }
+
+            crouchDelay -= Time.deltaTime;
         }
 
         if (mState == MovementStates.WallRun)
@@ -552,7 +553,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     {
         isCrouching = true;
 
-        crouchDelay = 0.25f;
+        crouchDelay = 0.1f;
 
         controller.height = 1;
         controller.center = new Vector3(0, -0.5f, 0);
@@ -565,7 +566,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     {
         isCrouching = false;
 
-        crouchDelay = 0.25f;
+        crouchDelay = 0.1f;
 
         controller.height = 2;
         controller.center = new Vector3(0, 0, 0);

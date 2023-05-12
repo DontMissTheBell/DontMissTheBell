@@ -41,11 +41,23 @@ public class DialogueMain : MonoBehaviour
     public IEnumerator WriteText(Text textDisplay)
     {
         string input = textDisplay.text;
+
+        bool skipBox = false;
+
         textDisplay.text = "";
         for (int i = 0; i < input.Length; i++)
         {
             textDisplay.text += input[i];
+
+            if (Input.GetMouseButton(1))
+            {
+                skipBox = true;
+            }
+
+            if (!skipBox)
+            {
             yield return new WaitForSeconds(delay);
+            }
         }
 
         while(!Input.GetMouseButtonDown(0))
