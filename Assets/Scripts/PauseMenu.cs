@@ -4,7 +4,18 @@ using DG.Tweening;
 
 public class PauseMenu : MonoBehaviour
 {
+
+    [SerializeField] GameObject pressEscText;
+
     // Update is called once per frame
+
+    private void Awake()
+    {
+        if (!Globals.HasUsedPause)
+        {
+            pressEscText.SetActive(true);
+        }
+    }
     private void Update()
     {
         // If Pause button pressed
@@ -14,6 +25,11 @@ public class PauseMenu : MonoBehaviour
             Globals.Instance.gamePaused = 0.0f == Time.timeScale;
             gameObject.GetComponentInChildren<Canvas>(true).enabled = 0.0f == Time.timeScale;
             Cursor.lockState = Globals.Instance.gamePaused ? CursorLockMode.None : CursorLockMode.Locked;
+
+            pressEscText.SetActive(false);
+            
+
+            Globals.HasUsedPause = true;
         }
             
     }
