@@ -20,7 +20,7 @@ public class MouseLookMainCharacter : MonoBehaviour
 
     private float tiltTime;
 
-    private float xRotation; // for the vertical camera movement
+    private float xRotation; // for the vertical camera movement 
 
     private void Start()
     {
@@ -51,6 +51,7 @@ public class MouseLookMainCharacter : MonoBehaviour
 
         if (isRolling)
         {
+            print("rolling");
             rollTime += Time.deltaTime;
             xRotation = Mathf.Lerp(xRotation, 0.0f, rollTime / rollDuration);
             if (rollTime > rollDuration) 
