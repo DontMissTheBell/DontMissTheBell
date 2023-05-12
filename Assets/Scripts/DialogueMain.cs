@@ -51,6 +51,11 @@ public class DialogueMain : MonoBehaviour
         textDisplay.text = "";
         for (int i = 0; i < input.Length; i++)
         {
+            while (Globals.Instance.gamePaused)
+            {
+                yield return null;
+            }
+
             textDisplay.text += input[i];
 
             if (Input.GetMouseButton(1))
@@ -69,6 +74,11 @@ public class DialogueMain : MonoBehaviour
         clickToSkip.SetActive(false);
 
         while(!Input.GetMouseButtonDown(0))
+        {
+            yield return null;
+        }
+
+        while (Globals.Instance.gamePaused)
         {
             yield return null;
         }
