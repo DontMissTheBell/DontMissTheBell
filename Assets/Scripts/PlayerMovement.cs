@@ -339,7 +339,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 if (CheckWallRun() && canWallRun && wallRunDelay <= 0 && Input.GetButton("Jump")) StartWallRun();
             }
 
-            if (controller.isGrounded) //
+            if (controller.isGrounded && !failRoll) //
             {
                 if (Input.GetKey(KeyCode.C) && crouchDelay <= 0 && !isCrouching)
                 {
