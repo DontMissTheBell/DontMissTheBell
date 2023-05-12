@@ -11,13 +11,13 @@ public class PauseMenu : MonoBehaviour
 
     private void Awake()
     {
-        if (!Globals.HasUsedPause)
-        {
-            pressEscText.SetActive(true);
-        }
     }
     private void Update()
     {
+        if (!Globals.HasUsedPause && !Globals.Instance.cutsceneActive) 
+        {
+            pressEscText.SetActive(true);
+        }
         // If Pause button pressed
         if (Input.GetButtonDown("Cancel") && !Globals.Instance.levelComplete)
         {
