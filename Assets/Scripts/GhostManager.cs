@@ -376,7 +376,9 @@ public class ReplayFrame
 
                 // Create a byte array to merge our arrays into, -1 because we are overwriting the middle byte
                 var newBytes = new byte[transformBytes.Length + bytes.Length - 1];
-                // Starts array with all of transformBytes data, leaving 0x00 at the end
+                // Copy in first byte of original array (cameraState)
+                Buffer.BlockCopy(bytes, 0, newBytes, 0, 1);
+                // Starts array at pos 1 with all of transformBytes data, leaving 0x00 at the end
                 Buffer.BlockCopy(transformBytes, 0, newBytes, 1, transformBytes.Length);
                 // Overwrites old instance of bytes
                 bytes = newBytes;
