@@ -25,7 +25,9 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
 
     [SerializeField] // The particle objects attached to the camera
-    private GameObject powerupParticle;
+    private GameObject powerupParticleSpeed;
+    [SerializeField]
+    private GameObject powerupParticleJump;
 
 
     public Transform groundCheck; // creates an input in unity we can put our epty ground check object into
@@ -108,7 +110,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private MovementStates mState = MovementStates.Run;
 
     private bool playerOnGround;
-    private ParticleSystem powerupParticleSystem;
+    private ParticleSystem powerupParticleSystemSpeed;
+    private ParticleSystem powerupParticleSystemJump;
     private RaycastHit rightWallData;
     private Vector3 slideDirection;
     private Vector3 slideEndPos;
@@ -135,7 +138,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     private void Start()
     {
-        powerupParticleSystem = powerupParticle.GetComponent<ParticleSystem>();
+        powerupParticleSystemSpeed = powerupParticleSpeed.GetComponent<ParticleSystem>();
+        powerupParticleSystemJump = powerupParticleJump.GetComponent<ParticleSystem>();
         defaultFov = playerCamera.fieldOfView;
         targetFov = defaultFov;
 
@@ -204,7 +208,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                 null; // The particle object is removed as a child so that it isnt immediately destroyed and has time to display the particles 
             Destroy(other.gameObject);
             Destroy(otherScript.particles.gameObject, 1f);
-            StartCoroutine(Powerup_Effect());
+            StartCoroutine(Powerup_Effect(otherScript.variant));
         }
 
         if (other.gameObject
@@ -738,25 +742,39 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         dodging = false;
     }
 
-    private IEnumerator Powerup_Effect() // Plays the powerup UI particles
+    private IEnumerator Powerup_Effect(float variant) // Plays the powerup UI particles
     {
-        powerupParticleSystem.Play();
-        yield return new WaitForSeconds(4.5f);
-        powerupParticleSystem.Stop();
+        if (variant == 1)
+        {
+            powerupParticleSystemSpeed.Play();
+        }
+        else
+        {
+            powerupParticleSystemJump.Play();
+        }
+        yield return new WaitForSeconds(7f);
+                if (variant == 1)
+        {
+            powerupParticleSystemSpeed.Stop();
+        }
+        else
+        {
+            powerupParticleSystemJump.Stop();
+        }
     }
 
     private IEnumerator Powerup_SpeedBoost() // Doubles the players speed for 5 seconds
     {
-        walkSpeed += defaultWalkSpeed;
-        yield return new WaitForSeconds(5);
-        walkSpeed -= defaultWalkSpeed;
+        walkSpeed += defaultWalkSpeed/2.5f;
+        yield return new WaitForSeconds(7.5f);
+        walkSpeed -= defaultWalkSpeed/2.5f;
     }
 
     private IEnumerator Powerup_JumpBoost() // Increases the players jump height for 5 seconds
     {
-        mcJumpHeight *= 1.5f;
-        yield return new WaitForSeconds(5);
-        mcJumpHeight /= 1.5f;
+        mcJumpHeight *= 1.25f;
+        yield return new WaitForSeconds(7.5f);
+        mcJumpHeight /= 1.25f;
     }
 
     private bool OnGround()

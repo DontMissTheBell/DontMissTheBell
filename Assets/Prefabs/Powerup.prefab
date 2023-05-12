@@ -112,7 +112,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particleObject: {fileID: 8134316488219292132}
-  particles: {fileID: 0}
+  particles: {fileID: 8134316488219292134}
   variant: 1
 --- !u!1 &8134316488219292132
 GameObject:

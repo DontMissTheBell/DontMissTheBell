@@ -60,6 +60,8 @@ public class DialogueMain : MonoBehaviour
             }
         }
 
+        yield return new WaitForSeconds(delay);
+
         while(!Input.GetMouseButtonDown(0))
         {
             yield return null;
