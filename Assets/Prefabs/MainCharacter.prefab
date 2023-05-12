@@ -86,6 +86,7 @@ MonoBehaviour:
   sprintSpeed: 1.75
   gravity: -35
   ySpeed: 0
+  cameraState: 0
   powerupParticleSpeed: {fileID: 7059952479309696469}
   powerupParticleJump: {fileID: 5714401950584407165}
   groundCheck: {fileID: 629006823114628732}
@@ -105,7 +106,7 @@ MonoBehaviour:
   jumpBufferMax: 0.05
   jumpDelayMax: 0.35
   coyoteTime: 0.2
-  slidePower: 30
+  slidePower: 27.5
   slideDuration: 1.5
   damageTint: {fileID: 0}
   maxFallHeight: -20
@@ -177,6 +178,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  slideDelayMax: 0.25
 --- !u!114 &629006821951210352
 MonoBehaviour:
   m_ObjectHideFlags: 0

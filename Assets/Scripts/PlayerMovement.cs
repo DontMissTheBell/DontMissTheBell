@@ -109,7 +109,10 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     [Header("Crouch")] private bool isCrouching;
 
-    [Header("Slide")] private bool isSliding;
+    [Header("Slide")] 
+    [SerializeField] private float slideDelayMax;
+    private float slideDelay;
+    private bool isSliding;
 
     private bool isSprinting;
     private float jumpBuffer;
@@ -356,7 +359,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             if (controller.isGrounded && !failRoll && !isRolling) //
             {
-                if (Input.GetKey(KeyCode.C) && crouchDelay <= 0 && !isCrouching)
+                if (Input.GetKey(KeyCode.C) && crouchDelay <= 0 && !isCrouching && slideDelay <= 0)
                 {
                     if (isSprinting) StartSlide(transform.forward * slidePower + transform.position);
                     StartCrouch();
@@ -368,6 +371,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
             }
 
             crouchDelay -= Time.deltaTime;
+            slideDelay -= Time.deltaTime;
         }
 
         if (mState == MovementStates.WallRun)
@@ -577,6 +581,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         controller.height = 1;
         controller.center = new Vector3(0, -0.5f, 0);
 
+        cameraState = CameraState.Crouching;
+
         playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y - 0.9f, 0.1f)
             .SetEase(Ease.InOutSine);
     }
@@ -590,8 +596,11 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         controller.height = 2;
         controller.center = new Vector3(0, 0, 0);
 
+        cameraState = CameraState.Standard;
+
         playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y + 0.9f, 0.1f)
             .SetEase(Ease.InOutSine);
+
     }
 
     private void StartSlide(Vector3 endPos)
@@ -601,6 +610,8 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         slideDirection = transform.forward;
 
         slideTime = 0;
+
+        slideDelay = slideDelayMax;
 
         isSliding = true;
     }
@@ -701,6 +712,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         walkSpeed /= 1.5f;
         isRolling = true;
         playerMesh.SetActive(false);
+        cameraState = CameraState.Rolling;
 
         while (t < duration)
         {
@@ -720,6 +732,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         walkSpeed *= 1.5f;
         isRolling = false;
         playerMesh.SetActive(true);
+        cameraState = CameraState.Standard;
     }
 
     private void FailRoll()
