@@ -79,6 +79,7 @@ MonoBehaviour:
   controller: {fileID: 629006821951210366}
   playerCamera: {fileID: 5483144890721847780}
   cameraPivot: {fileID: 7020897088214450499}
+  playerMesh: {fileID: 6549295063234422299}
   health: 50
   defaultWalkSpeed: 10
   walkSpeed: 0
@@ -102,12 +103,13 @@ MonoBehaviour:
   dodgePower: 3
   mcJumpHeight: 10
   jumpBufferMax: 0.05
-  jumpDelayMax: 0.25
+  jumpDelayMax: 0.35
   coyoteTime: 0.2
   slidePower: 30
   slideDuration: 1.5
   damageTint: {fileID: 0}
   maxFallHeight: -20
+  rollDurationMax: 0.6
   wallJumpForce: 15
   wallJumpTimeMax: 0.5
   wallRunSpeed: 10
@@ -10190,6 +10192,11 @@ PrefabInstance:
 --- !u!4 &3337691066747877500 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8779734002706592668, guid: 011db2f6c13d8d645bcead52bb59ed04, type: 3}
+  m_PrefabInstance: {fileID: 6306796332916853728}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6549295063234422299 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 965451407424515579, guid: 011db2f6c13d8d645bcead52bb59ed04, type: 3}
   m_PrefabInstance: {fileID: 6306796332916853728}
   m_PrefabAsset: {fileID: 0}
 --- !u!95 &8696996804735902214 stripped

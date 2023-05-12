@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
     [SerializeField] private Camera playerCamera;
     [SerializeField] private GameObject cameraPivot;
+    [SerializeField] private GameObject playerMesh;
 
     [SerializeField] private int health;
 
@@ -690,6 +691,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         walkSpeed /= 1.5f;
         isRolling = true;
+        playerMesh.SetActive(false);
 
         while (t < duration)
         {
@@ -700,7 +702,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
             var xRotation = Mathf.Lerp(startRotation, endRotation, newT) % 360;
 
-            cameraPivot.transform.eulerAngles = new Vector3(xRotation, yRotation, zRotation);
+            cameraPivot.transform.eulerAngles = new Vector3(xRotation, transform.eulerAngles.y, transform.eulerAngles.z); 
 
 
             yield return null;
@@ -708,6 +710,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         walkSpeed *= 1.5f;
         isRolling = false;
+        playerMesh.SetActive(true);
     }
 
     private void FailRoll()

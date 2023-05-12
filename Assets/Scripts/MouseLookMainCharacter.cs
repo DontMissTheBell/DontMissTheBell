@@ -13,6 +13,7 @@ public class MouseLookMainCharacter : MonoBehaviour
     private bool isTilting;
     private float rollDuration;
     private float rollTime;
+    private float rollSens = 1.0f;
     private float startTilt;
     private float tiltDuration;
     private float tiltTarget;
@@ -33,12 +34,15 @@ public class MouseLookMainCharacter : MonoBehaviour
         var mouseY = 0f;
 
         // Only runs if the game is unpaused
-        if (!Globals.Instance.gamePaused && !isRolling && !Globals.Instance.cutsceneActive)
+        if (!Globals.Instance.gamePaused&& !Globals.Instance.cutsceneActive)
         {
             mouseX = Input.GetAxis("Mouse X") * mouseSensitivity *
                      Time.fixedDeltaTime; // creates a variable saying to move the camera along x axis if mouse is moving along x axis at the mouseSensitivity rate multiplied by time delta
+            if (!isRolling)
+            {
             mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity *
                      Time.fixedDeltaTime; // Time Delta ensures that we will be moving our camera in correlation with our fps essentially
+            }
         }
 
         xRotation -=
@@ -49,7 +53,11 @@ public class MouseLookMainCharacter : MonoBehaviour
         {
             rollTime += Time.deltaTime;
             xRotation = Mathf.Lerp(xRotation, 0.0f, rollTime / rollDuration);
-            if (rollTime > rollDuration) isRolling = false;
+            if (rollTime > rollDuration) 
+            {
+                isRolling = false;
+                rollSens = 1.0f;
+            }
         }
 
 
@@ -71,7 +79,7 @@ public class MouseLookMainCharacter : MonoBehaviour
         }
 
         playerBody.Rotate(Vector3.up *
-                          mouseX); // rotates whatever transform we put into the Transform variable at the start for us it will be the player, then it will rotate the player alongside the camera
+                          mouseX * rollSens); // rotates whatever transform we put into the Transform variable at the start for us it will be the player, then it will rotate the player alongside the camera
     }
 
     public void StartTiltScreen(float duration, float tilt, bool reverse)
@@ -102,5 +110,6 @@ public class MouseLookMainCharacter : MonoBehaviour
         isRolling = true;
         rollDuration = duration;
         rollTime = 0.0f;
+        rollSens = 0.5f;
     }
 }
