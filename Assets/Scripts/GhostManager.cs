@@ -115,6 +115,8 @@ public class GhostManager : MonoBehaviour
                     {
                         // Set player transform to data in current frame
                         replayFrames[currentFrameIndex].ExportTransform(transform);
+                        // Set camera state
+                        playerMovement.SetCameraState(replayFrames[currentFrameIndex].cameraState);
                         // Update ideal camera rotation
                         if (replayFrames[currentFrameIndex].hasCameraTransform)
                             idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
