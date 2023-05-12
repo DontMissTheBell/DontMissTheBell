@@ -34,18 +34,18 @@ public class DialogueMain : MonoBehaviour
         StartCoroutine(WriteText(DialogueBoxes[index].GetComponent<Text>()));
     }
 
-    public IEnumerator WriteText(Text textDisplay)
+    private IEnumerator WriteText(Text textDisplay)
     {
         var input = textDisplay.text;
 
         var skipBox = false;
 
         textDisplay.text = "";
-        for (var i = 0; i < input.Length; i++)
+        foreach (var t in input)
         {
             while (Globals.Instance.gamePaused) yield return null;
 
-            textDisplay.text += input[i];
+            textDisplay.text += t;
 
             if (Input.GetMouseButton(1)) skipBox = true;
 
