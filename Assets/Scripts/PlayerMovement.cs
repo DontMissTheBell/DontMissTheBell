@@ -562,7 +562,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         controller.height = 1;
         controller.center = new Vector3(0, -0.5f, 0);
 
-        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y - 0.75f, 0.1f)
+        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y - 0.9f, 0.1f)
             .SetEase(Ease.InOutSine);
     }
 
@@ -575,7 +575,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         controller.height = 2;
         controller.center = new Vector3(0, 0, 0);
 
-        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y + 0.75f, 0.1f)
+        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y + 0.9f, 0.1f)
             .SetEase(Ease.InOutSine);
     }
 
