@@ -9,6 +9,8 @@ public class AnimControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!Globals.Instance.cutsceneActive)
+        {
         bool isRunning = animator.GetBool("isRunning");
         bool isWalking = animator.GetBool("isWalking");
         bool forwardPressed = Input.GetKey("w");
@@ -29,6 +31,7 @@ public class AnimControl : MonoBehaviour
         if (isRunning && (!forwardPressed || !runPressed))
         {
             animator.SetBool("isRunning", false);
+        }
         }
     }
 }
