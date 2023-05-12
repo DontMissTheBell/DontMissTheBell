@@ -1,21 +1,19 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class DialogueMain : MonoBehaviour
 {
-
     [SerializeField] private float delay;
 
     [SerializeField] private Cutscene Cutscene;
 
-    [SerializeField] GameObject clickToSkip;
+    [SerializeField] private GameObject clickToSkip;
+
+    public GameObject[] DialogueBoxes;
 
     private GameObject currentAvatar;
     private GameObject lastAvatar;
-
-    public GameObject[] DialogueBoxes;
 
     public void StartWritingText(int index)
     {
@@ -24,18 +22,12 @@ public class DialogueMain : MonoBehaviour
         clickToSkip.SetActive(true);
 
 
-        if (index > 0) 
-        {
-            lastAvatar = currentAvatar;
-        }
-        
+        if (index > 0) lastAvatar = currentAvatar;
+
 
         currentAvatar = DialogueBoxes[index].GetComponent<DialogueBox>().Avatar;
 
-        if (index > 0 && lastAvatar != currentAvatar)
-        {
-        lastAvatar.SetActive(false);
-        }
+        if (index > 0 && lastAvatar != currentAvatar) lastAvatar.SetActive(false);
 
         currentAvatar.SetActive(true);
 
@@ -44,48 +36,32 @@ public class DialogueMain : MonoBehaviour
 
     public IEnumerator WriteText(Text textDisplay)
     {
-        string input = textDisplay.text;
+        var input = textDisplay.text;
 
-        bool skipBox = false;
+        var skipBox = false;
 
         textDisplay.text = "";
-        for (int i = 0; i < input.Length; i++)
+        for (var i = 0; i < input.Length; i++)
         {
-            while (Globals.Instance.gamePaused)
-            {
-                yield return null;
-            }
+            while (Globals.Instance.gamePaused) yield return null;
 
             textDisplay.text += input[i];
 
-            if (Input.GetMouseButton(1))
-            {
-                skipBox = true;
-            }
+            if (Input.GetMouseButton(1)) skipBox = true;
 
-            if (!skipBox)
-            {
-            yield return new WaitForSeconds(delay);
-            }
+            if (!skipBox) yield return new WaitForSeconds(delay);
         }
 
         yield return new WaitForSeconds(delay);
 
-        clickToSkip.SetActive(false);
+        //clickToSkip.SetActive(false);
 
-        while(!Input.GetMouseButtonDown(0))
-        {
-            yield return null;
-        }
+        while (!Input.GetMouseButtonDown(0)) yield return null;
 
-        while (Globals.Instance.gamePaused)
-        {
-            yield return null;
-        }
+        while (Globals.Instance.gamePaused) yield return null;
 
         Cutscene.writingDialogue = false;
 
-        textDisplay.text = "";        
-    }  
-
+        textDisplay.text = "";
+    }
 }
