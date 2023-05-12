@@ -19,6 +19,7 @@ public class Globals : MonoBehaviour
     public bool runningLate;
     public bool dynamicFOV;
     public bool firstRun;
+    public bool skipCutscene;
 
     public int playerID;
     public Guid playerSecret;

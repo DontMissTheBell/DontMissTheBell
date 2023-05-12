@@ -207,6 +207,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
                     Time.timeScale = 1.0f;
                     Globals.Instance.StartCoroutine(
                         Globals.Instance.TriggerLoadingScreen(sceneId: SceneManager.GetActiveScene().buildIndex));
+                    Globals.Instance.skipCutscene = true;
                 }
             }
         }
