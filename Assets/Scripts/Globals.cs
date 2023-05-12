@@ -23,6 +23,11 @@ public class Globals : MonoBehaviour
     public int playerID;
     public Guid playerSecret;
 
+    public static bool HasUsedPause
+    {
+        get => PlayerPrefs.HasKey("has_used_pause");
+        set => PlayerPrefs.SetInt("has_used_pause", Convert.ToInt32(value));
+    }
     public static string Username
     {
         get => PlayerPrefs.GetString("username");
