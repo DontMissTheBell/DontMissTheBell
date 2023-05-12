@@ -605,6 +605,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   homework: {fileID: 780089610}
   timer: {fileID: 0}
+  getHomework: {fileID: 0}
 --- !u!1 &89573457
 GameObject:
   m_ObjectHideFlags: 0
@@ -21079,8 +21080,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 841594552}
+  playerMovement: {fileID: 0}
   shouldRecord: 0
   shouldReplay: 1
+  shouldPlayCutscene: 0
   ghostID: 989deb9e-85c9-472b-95da-be2cfc83cfc8
 --- !u!114 &1537819114
 MonoBehaviour:
@@ -21096,12 +21099,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 1537819115}
   playerCamera: {fileID: 841594556}
+  cameraPivot: {fileID: 0}
+  playerMesh: {fileID: 0}
   health: 0
   defaultWalkSpeed: 0
+  walkSpeed: 0
   sprintSpeed: 0
   gravity: 0
   ySpeed: 0
-  powerupParticle: {fileID: 1444209015}
+  cameraState: 0
+  powerupParticleSpeed: {fileID: 0}
+  powerupParticleJump: {fileID: 0}
   groundCheck: {fileID: 438655249}
   groundDistance: 0.4
   groundMask:
@@ -21117,16 +21125,19 @@ MonoBehaviour:
   dodgePower: 3
   mcJumpHeight: 0
   jumpBufferMax: 0.25
+  jumpDelayMax: 0
   coyoteTime: 0.2
   slidePower: 30
   slideDuration: 1.5
   damageTint: {fileID: 0}
   maxFallHeight: 0
+  rollDurationMax: 0
   wallJumpForce: 20
   wallJumpTimeMax: 0.5
   wallRunSpeed: 15
   wallJumpDelay: 0.2
   wallRunTiltMax: 7.5
+  wallRunDelayMax: 0
   grapJumpDelay: 0
   vaultDuration: 0.25
   maxVaultDistance: 0
@@ -21143,6 +21154,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  slideDelayMax: 0
 --- !u!143 &1537819115
 CharacterController:
   m_ObjectHideFlags: 0

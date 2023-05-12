@@ -63,7 +63,7 @@ public class GhostManager : MonoBehaviour
         if (cameraTransform.localRotation != idealCameraRotation && playbackBegun &&
             currentFrameIndex + 1 != replayLength)
             cameraTransform.rotation =
-                Quaternion.LerpUnclamped(cameraTransform.rotation, idealCameraRotation, Time.deltaTime * 10);
+                Quaternion.LerpUnclamped(cameraTransform.rotation, idealCameraRotation, Time.deltaTime * 1000000);
     }
 
     private void FixedUpdate()
@@ -119,7 +119,10 @@ public class GhostManager : MonoBehaviour
                         playerMovement.SetCameraState(replayFrames[currentFrameIndex].cameraState);
                         // Update ideal camera rotation
                         if (replayFrames[currentFrameIndex].hasCameraTransform)
+                        {
                             idealCameraRotation = Quaternion.Euler(replayFrames[currentFrameIndex].cameraRotation);
+                        }
+
                         //Debug.Log(idealCameraRotation);
                         // We need to move on to the next frame's data
                         currentFrameIndex++;
@@ -216,7 +219,8 @@ public class GhostManager : MonoBehaviour
 
         for (var frameIndex = 0; frameIndex < replayLength; frameIndex++)
         {
-            var frameSize = 2;
+            var frameSize = 3;
+            ghostData.Seek(1, SeekOrigin.Current);
 
             if (ghostData.ReadByte() == 0x01)
             {
@@ -314,12 +318,11 @@ public class ReplayFrame
     private Vector3 position, eulerAngles;
 
     // Class initializer, optional parameter is transform and camera transform
-    public ReplayFrame(Transform tr = null, Transform cameraTr = null, byte[] byteArray = null, PlayerMovement.CameraState cameraSt = PlayerMovement.CameraState.Standard)
+    public ReplayFrame(Transform tr = null, Transform cameraTr = null, byte[] byteArray = null)
     {
         if (byteArray != null) AsByteArray = byteArray;
         if (tr) Transform = tr;
         if (cameraTr) CameraTransform = cameraTr;
-        cameraState = cameraSt;
     }
 
     // Extracts the position and rotation data from a given transform,
