@@ -12,6 +12,7 @@ public class Cutscene : MonoBehaviour
     [SerializeField] Camera CutsceneCamera;
 
     [SerializeField] GameObject TimerObject;
+    [SerializeField] GameObject clickToStart;
 
 
     public bool writingDialogue;
@@ -60,26 +61,42 @@ public class Cutscene : MonoBehaviour
 
     private IEnumerator StartCutscene()
     {
-        for(int i=0; i < Dialogue.DialogueBoxes.Length; i++)
+        if (!Globals.Instance.skipCutscene)
         {
-            writingDialogue = true;
-            Dialogue.StartWritingText(i);
-
-            while (writingDialogue)
+            for(int i=0; i < Dialogue.DialogueBoxes.Length; i++)
             {
-                yield return null;
+                writingDialogue = true;
+                Dialogue.StartWritingText(i);
+
+                while (writingDialogue)
+                {
+                    yield return null;
+                }
+
             }
-
         }
-        Globals.Instance.firstRun = false;
-
-        Globals.Instance.EndCutscene();
 
         Dialogue.gameObject.SetActive(false);
 
         CutsceneCamera.enabled = false;
 
+        if (Globals.Instance.skipCutscene)
+        {
+            clickToStart.SetActive(true);
+            while(!Input.GetMouseButtonDown(0))
+            {
+                yield return null;
+            }
+            clickToStart.SetActive(false);
+        }
+
+        Globals.Instance.firstRun = false;
+
+        Globals.Instance.EndCutscene();
+
         TimerObject.SetActive(true);
+
+        Globals.Instance.skipCutscene = false;
 
 
 
