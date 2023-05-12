@@ -12,7 +12,7 @@ public class Volume : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        SetVolume(PlayerPrefs.GetFloat("SavedMasterVolume", 100));
+        SetVolume(PlayerPrefs.GetFloat("SavedMasterVolume", 30));
     }
 
     public void SetVolume(float VolumeValue)
