@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,7 +29,8 @@ public class Optionsbuttonscript : MonoBehaviour
 
     public void setDynamicFOV()
     {
-        Globals.Instance.DynamicFOV = !Globals.Instance.DynamicFOV;
+        Globals.Instance.dynamicFOV = !Globals.Instance.dynamicFOV;
+        PlayerPrefs.SetInt("dynamic_fov", Convert.ToInt32(Globals.Instance.dynamicFOV));
     }
 
     //void for volume here when get music

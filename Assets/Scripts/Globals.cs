@@ -17,6 +17,7 @@ public class Globals : MonoBehaviour
     public bool gamePaused;
     public bool levelComplete;
     public bool runningLate;
+    public bool dynamicFOV;
 
     public int playerID;
     public Guid playerSecret;
@@ -75,6 +76,15 @@ public class Globals : MonoBehaviour
             playerSecret = new Guid(PlayerPrefs.GetString("player_secret"));
         }
 
+        if (!PlayerPrefs.HasKey("dynamic_fov"))
+        {
+            dynamicFOV = true;
+            PlayerPrefs.SetInt("dynamic_fov", Convert.ToInt32(dynamicFOV));
+        }
+        else
+        {
+            dynamicFOV = Convert.ToBoolean(PlayerPrefs.GetInt("dynamic_fov"));
+        }
     }
 
     public void EndCutscene()
