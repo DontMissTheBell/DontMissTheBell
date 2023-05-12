@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
+using System.Diagnostics;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
 
 public class PlayerMovement : MonoBehaviour // used MC_ for main character variables to cause less confusion later on
 {
@@ -726,10 +728,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
     private IEnumerator Roll()
     {
         var startRotation = cameraPivot.transform.eulerAngles.x;
-        var endRotation = startRotation + 360.0f;
-
-        var yRotation = cameraPivot.transform.eulerAngles.y;
-        var zRotation = cameraPivot.transform.eulerAngles.z;
+        var endRotation = startRotation > 180.0f ? 720.0f : 360.0f;
 
         var duration = rollDurationMax;
         var t = 0.0f;
