@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
@@ -191,7 +192,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         if (!Globals.Instance.cutsceneActive)
         {
-        MovementState();
+            MovementState();
         }
 
         // If the player has failed a roll
@@ -207,6 +208,32 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         // Smoothly changes the cameras FOV depending on if the value of the targetFov value
         playerCamera.fieldOfView = Mathf.SmoothDamp(playerCamera.fieldOfView, targetFov, ref dampingVelocity, 0.1f);
+    }
+
+    // Used by ghost replays
+    public void SetCameraState(CameraState state)
+    {
+        cameraState = state;
+        switch (state)
+        {
+            case CameraState.Standard:
+                Debug.Log("standard");
+                playerMesh.SetActive(true);
+                playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y + 0.9f, 0.1f)
+                    .SetEase(Ease.InOutSine);
+                break;
+            case CameraState.Crouching:
+                Debug.Log("crouch");
+                playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y - 0.9f, 0.1f)
+                    .SetEase(Ease.InOutSine);
+                break;
+            case CameraState.Rolling:
+                Debug.Log("roll");
+                playerMesh.SetActive(false);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(state), state, null);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -586,10 +613,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         controller.height = 1;
         controller.center = new Vector3(0, -0.5f, 0);
 
-        cameraState = CameraState.Crouching;
-
-        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y - 0.9f, 0.1f)
-            .SetEase(Ease.InOutSine);
+        SetCameraState(CameraState.Crouching);
     }
 
     private void EndCrouch()
@@ -601,11 +625,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
         controller.height = 2;
         controller.center = new Vector3(0, 0, 0);
 
-        cameraState = CameraState.Standard;
-
-        playerCamera.transform.DOLocalMoveY(playerCamera.transform.localPosition.y + 0.9f, 0.1f)
-            .SetEase(Ease.InOutSine);
-
+        SetCameraState(CameraState.Standard);
     }
 
     private void StartSlide(Vector3 endPos)
@@ -716,8 +736,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         walkSpeed /= 1.5f;
         isRolling = true;
-        playerMesh.SetActive(false);
-        cameraState = CameraState.Rolling;
+        SetCameraState(CameraState.Rolling);
 
         while (t < duration)
         {
@@ -736,8 +755,7 @@ public class PlayerMovement : MonoBehaviour // used MC_ for main character varia
 
         walkSpeed *= 1.5f;
         isRolling = false;
-        playerMesh.SetActive(true);
-        cameraState = CameraState.Standard;
+        SetCameraState(CameraState.Standard);
     }
 
     private void FailRoll()
