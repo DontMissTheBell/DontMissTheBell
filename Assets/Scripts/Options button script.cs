@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,6 +7,9 @@ public class Optionsbuttonscript : MonoBehaviour
 {
     public Toggle fullscreenToggle;
     public Toggle dynamicFOVToggle;
+
+    public TMP_Dropdown qualityDropdown;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -17,9 +21,9 @@ public class Optionsbuttonscript : MonoBehaviour
         Screen.fullScreen = fullscreenToggle.isOn;
     }
 
-    public void SetQuality(int qualityIndex)
+    public void SetQuality()
     {
-        QualitySettings.SetQualityLevel(qualityIndex);
+        QualitySettings.SetQualityLevel(qualityDropdown.value);
     }
 
     public void SetDynamicFOV()
